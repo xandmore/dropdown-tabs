@@ -1,0 +1,41 @@
+@import "node_modules/nord/src/sass/nord";
+@import "./components/Tabs/TabPane/TabPane.scss";
+
+$tabs-height: 50px;
+$tabs-background-color: #2e3440;
+$tabs-font-color: #e5e9f0;
+
+.tabs {
+  display: flex;
+  position: relative;
+  height: $tabs-height;
+  background-color: $tabs-background-color;
+  color: $tabs-font-color;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: $nord2;
+  }
+
+  &_active {
+    // color: var(--text-primary-color);
+    background-color: $nord1;
+  }
+}
+
+.dropdown-menu {
+  cursor: auto;
+  position: absolute;
+  top: $tabs-height;
+  left: 0;
+  background: $nord4;
+  padding: 10px;
+  color: #212121;
+}
