@@ -1,8 +1,21 @@
 import React from "react";
 import bem from "../../../helpers/bem";
+import { DropdownTab, Section, TabKey } from "../types";
 const bemMenu = bem("dropdown-menu");
 
-function DropdownMenu({ onChange, sections, width = 250, opened, activeKey }) {
+export type DropdownMenuProps = {
+  onChange: (key: TabKey) => void;
+  sections: Section[];
+  width?: number;
+  activeKey: TabKey | null;
+};
+
+export function DropdownMenu({
+  onChange,
+  sections,
+  width = 250,
+  activeKey,
+}: DropdownMenuProps) {
   return (
     <div
       className={bemMenu()}
@@ -13,7 +26,6 @@ function DropdownMenu({ onChange, sections, width = 250, opened, activeKey }) {
         return (
           !!s.tabs?.length && (
             <DropdownMenuSection
-              key={i}
               onChange={onChange}
               {...s}
               activeKey={activeKey}
@@ -25,7 +37,19 @@ function DropdownMenu({ onChange, sections, width = 250, opened, activeKey }) {
   );
 }
 
-function DropdownMenuSection({ title, tabs, onChange, activeKey }) {
+export type DropdownMenuSectionProps = {
+  title: Section["title"];
+  tabs: DropdownTab[];
+  onChange: (key: TabKey) => void;
+  activeKey: TabKey | null;
+};
+
+function DropdownMenuSection({
+  title,
+  tabs,
+  onChange,
+  activeKey,
+}: DropdownMenuSectionProps) {
   return (
     <div>
       <span className={bemMenu("section-title")}>{title}</span>
@@ -42,22 +66,31 @@ function DropdownMenuSection({ title, tabs, onChange, activeKey }) {
   );
 }
 
+export type DropdownMenuItemProps = {
+  active?: boolean;
+  disabled?: boolean;
+  title: DropdownTab["title"];
+  locked?: boolean;
+  starred?: boolean;
+  onClick: () => void;
+};
+
 function DropdownMenuItem({
   active,
   disabled,
   title,
   locked,
   starred,
-  onClick
-}) {
+  onClick,
+}: DropdownMenuItemProps) {
   return (
     <li
       className={bemMenu("item", {
         active: active,
         locked: locked,
-        disabled: disabled
+        disabled: disabled,
       })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? undefined : onClick}
     >
       {starred && (
         <span role="img" aria-label="Starred" className={bemMenu("star-icon")}>

@@ -1,9 +1,15 @@
 import React from "react";
 import bem from "../../helpers/bem";
+import { Tab } from "./types";
 
 const bemTab = bem("tab");
 
-function Tab({ title, active, ...rest }) {
+export type TabProps = {
+  title: Tab["title"];
+  active: boolean;
+};
+
+function TabComponent({ title, active, ...rest }: TabProps) {
   return (
     <div className={bemTab({ active: active })} role="tab" {...rest}>
       {title}
@@ -11,4 +17,4 @@ function Tab({ title, active, ...rest }) {
   );
 }
 
-export default Tab;
+export default TabComponent;

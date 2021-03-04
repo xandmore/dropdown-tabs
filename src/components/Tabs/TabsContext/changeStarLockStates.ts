@@ -1,8 +1,8 @@
 import { DropdownTab, TabKey } from "../types";
 import { State } from "./reducer";
 
-type TabLockAction = "lock" | "unlock" | "toggle";
-type TabStarAction = "star" | "unstar" | "toggle";
+export type TabLockAction = "lock" | "unlock" | "toggle";
+export type TabStarAction = "star" | "unstar" | "toggle";
 
 export function changeTabsLockedState(
   state: State,

@@ -1,20 +1,37 @@
 import React, { useCallback, useEffect, useState } from "react";
 import DropdownMenu from "../DropdownTabMenu/DropdownTabMenu";
 import bem from "../../../helpers/bem";
+import { DropdownTab, Section, TabKey } from "../types";
 
 const bemTab = bem("tab");
 
-function DropdownTab({
+export type DropdownTabKey = TabKey | Symbol;
+
+export type DropdownTabProps = {
+  onChange: (key: DropdownTabKey) => void;
+  sections: Section[];
+  activeKey: DropdownTabKey;
+  defaultKey?: TabKey | null;
+  placeholder?: React.ReactNode;
+};
+
+function DropdownTabComponent({
   onChange,
   sections,
   activeKey,
   defaultKey,
-  placeholder = "Active Tabs"
-}) {
+  placeholder = "Active Tabs",
+}: DropdownTabProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [activeTabInfo, setActiveTabInfo] = useState(() => {
-    getTabByKey(activeKey) || getTabByKey(defaultKey, sections);
+    if (isSymbol(activeKey)) {
+      return null;
+    } else {
+      return (
+        getTabByKey(activeKey, sections) || getTabByKey(defaultKey!, sections)
+      );
+    }
   });
 
   useEffect(() => {
@@ -42,7 +59,7 @@ function DropdownTab({
         return !open;
       }
 
-      return activeTabInfo ? false : true;
+      return !activeTabInfo;
     });
 
     if (activeTabInfo) {
@@ -59,8 +76,8 @@ function DropdownTab({
   const title = activeTabInfo?.title ?? placeholder;
 
   const onSelectTab = useCallback(
-    (...args) => {
-      onChange?.(...args);
+    (tabKey: DropdownTabKey) => {
+      onChange?.(tabKey);
       setIsOpen(false);
     },
     [onChange]
@@ -78,20 +95,28 @@ function DropdownTab({
         <DropdownMenu
           sections={sections}
           onChange={onSelectTab}
-          activeKey={activeKey}
+          activeKey={isSymbol(activeKey) ? null : activeKey}
         />
       )}
     </div>
   );
 }
 
-function getTabByKey(key, sections) {
-  let target = null;
+function getTabByKey(key: DropdownTabKey, sections: Section[]) {
+  if (isSymbol(key)) {
+    return null;
+  }
+
+  let target: DropdownTab | null = null;
   for (let i = 0; !target && i < sections?.length; i++) {
-    target = sections[i].tabs?.find((t) => t.key === key);
+    target = sections[i].tabs?.find((t) => t.key === key) ?? null;
   }
 
   return target;
 }
 
-export default DropdownTab;
+function isSymbol<T>(key: T | Symbol): key is Symbol {
+  return typeof key === "symbol";
+}
+
+export default DropdownTabComponent;

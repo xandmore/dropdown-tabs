@@ -3,10 +3,10 @@ import { Section, TabKey } from "../../types";
 export function tabsToMapLike<T extends { key: string }>(
   tabs: T[]
 ): Record<string, T> {
-  return tabs.reduce((obj: Record<string, T>, tab: T) => {
+  return tabs.reduce<Record<string, T>>((obj, tab: T) => {
     obj[tab.key] = tab;
     return obj;
-  }, {} as Record<T["key"], T>);
+  }, {});
 }
 
 export function getSectionTabIndex(sections: Section[], tabKey: TabKey) {

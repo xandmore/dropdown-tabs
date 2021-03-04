@@ -1,26 +1,31 @@
 import React, { useCallback, useMemo, useState } from "react";
-import Tab from "./Tab";
+import TabComponent from "./TabComponent";
 import bem from "../../helpers/bem";
-import DropdownTab from "./DropdownTab/DropdownTab";
+import DropdownTabComponent from "./DropdownTab/DropdownTabComponent";
+import { Section, Tab } from "./types";
+import useTabs from "./hooks/useTabs";
 // import { TabsInnerContextProvider } from "./TabContent";
 
 const bemTabs = bem("tabs");
 
-const dropdownTabKeySymbol = Symbol();
+export type TabsProps = {
+  // tabs: Tab[];
+  // sections: Section[];
+  defaultActiveKey: Tab["key"];
+};
 
-function Tabs({
-  tabs,
-  sections,
-  onTabClose,
-  onTabLocked,
-  onTabStarred,
+function TabsComponent({
+  // tabs,
+  // sections,
   onChange: onChangeProp,
   activeKey: activeKeyProp,
   defaultActiveKey,
-  defaultDropdownKey
-}) {
+}: // defaultDropdownKey,
+TabsProps) {
+  // const { sections, activeKey, onTabClose, removeTabs } = useTabs();
+
   const [activeKeyInner, setActiveKeyInner] = useState(() =>
-    activeKeyProp !== undefined ? activeKeyProp : defaultActiveKey ?? null
+    activeKey !== undefined ? activeKey : defaultActiveKey ?? null
   );
 
   const onChange = useCallback(
@@ -45,7 +50,7 @@ function Tabs({
   return (
     <div className="tabs">
       {tabs.map((t) => (
-        <Tab
+        <TabComponent
           key={t.key}
           title={t.title}
           onClick={() => onChange(t.key)}
@@ -54,7 +59,7 @@ function Tabs({
       ))}
 
       {isDropdownTabDisplayed && (
-        <DropdownTab
+        <DropdownTabComponent
           activeKey={activeTabKey}
           onChange={onChange}
           sections={sections}
@@ -68,10 +73,10 @@ function Tabs({
 
 function Slider(props) {
   const style = {
-    width: 80
+    width: 80,
   };
 
   return <span class="tabs__slider" {...props} style={style}></span>;
 }
 
-export default Tabs;
+export default TabsComponent;

@@ -3,17 +3,20 @@ import React, {
   createContext,
   PropsWithChildren,
   useCallback,
+  Dispatch,
 } from "react";
 
-import { reducer, ActionType } from "./reducer";
+import { reducer, ActionType, ReducerAction } from "./reducer";
 import { TabKey, Tab, Section } from "../types";
 
 type TabsContextProps = {
   activeKey: TabKey | null;
   tabs: Tab[];
   sections: Section[];
-  removeTabs: (keys: TabKey | TabKey[]) => void;
-  onTabClose: (key: TabKey) => void;
+  // setActiveKey: (key: TabKey) => void;
+  // removeTabs: (keys: TabKey | TabKey[]) => void;
+  // onTabClose: (key: TabKey) => void;
+  dispatch: Dispatch<ReducerAction<ActionType>>;
 };
 
 const TabsContext = createContext({} as TabsContextProps);
@@ -46,12 +49,18 @@ const TabsContextProvider = ({
     dispatch({ type: ActionType.RemoveTabs, payload: key });
   }, []);
 
+  const setActiveKey = useCallback((key: TabKey | null) => {
+    dispatch({ type: ActionType.SetActiveKey, payload: key });
+  }, []);
+
   return (
     <TabsContext.Provider
       value={{
         ...state,
-        removeTabs,
-        onTabClose,
+        // removeTabs: removeTabs,
+        // setActiveKey: setActiveKey,
+        // onTabClose,
+        dispatch,
       }}
     >
       {children}

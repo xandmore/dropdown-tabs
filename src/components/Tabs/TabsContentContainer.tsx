@@ -1,8 +1,19 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Section, Tab, TabKey } from "./types";
 
-function TabsContentContainer({ tabs, sections, activeKey }) {
+export type TabsContentContainerProps = {
+  tabs: Tab[];
+  sections: Section[];
+  activeKey: TabKey;
+};
+
+function TabsContentContainer({
+  tabs,
+  sections,
+  activeKey,
+}: TabsContentContainerProps) {
   const [shift, setShift] = useState(0);
-  const containerRef = useRef();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const flattenTabs = useMemo(() => {
     let flatten = tabs ? [...tabs] : [];
@@ -19,13 +30,13 @@ function TabsContentContainer({ tabs, sections, activeKey }) {
     return flatten;
   }, [tabs, sections]);
 
-  useRef(() => {
+  useEffect(() => {
     let index = getTabIndex(activeKey, tabs, sections);
 
     if (index === -1) {
       console.error(`Cannot find tab with key ${activeKey}`);
     } else {
-      setShift(containerRef.current.getBoundingClientRect().width * index);
+      setShift(containerRef.current!.getBoundingClientRect().width * index);
     }
   }, [tabs, sections, activeKey]);
 
@@ -39,7 +50,7 @@ function TabsContentContainer({ tabs, sections, activeKey }) {
 /**
  * Returns tab index from tabs and sections.tabs union
  */
-function getTabIndex(key, tabs, sections) {
+function getTabIndex(key: TabKey, tabs: Tab[], sections: Section[]) {
   let index = tabs?.findIndex((t) => t.key === key) ?? -1;
 
   if (index === -1) {

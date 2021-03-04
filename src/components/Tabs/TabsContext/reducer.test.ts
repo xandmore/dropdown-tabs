@@ -1,4 +1,4 @@
-import { State, addSections } from "./reducer";
+import { State } from "./reducer";
 import { DropdownTab, Tab, Section } from "../types";
 import { addTabs } from "./addTabs";
 import { closeDropdownTab } from "./closeDropdownTab";
@@ -6,7 +6,9 @@ import {
   changeTabsLockedState,
   changeTabsStarredState,
 } from "./changeStarLockStates";
+
 import { removeTabs } from "./removeTabs";
+import { addSections } from "./addSections";
 
 describe("removeTabs", () => {
   const state: State = {
@@ -539,7 +541,7 @@ describe("addTabs", () => {
   });
 });
 
-describe("add sections", () => {
+describe("addSections", () => {
   const state: State = {
     activeKey: null,
     tabs: [],

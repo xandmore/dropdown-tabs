@@ -6,7 +6,7 @@ import { State } from "./reducer";
 export function closeDropdownTab(
   state: State,
   key: TabKey,
-  newActiveKey?: TabKey
+  newActiveKey?: TabKey | null
 ): State {
   const sectionTabIndex = getSectionTabIndex(state.sections, key);
 

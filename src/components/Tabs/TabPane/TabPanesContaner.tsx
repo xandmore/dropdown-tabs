@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import TabPane from "./TabPane";
-import useTabs from "./hooks/useTabs";
+import useTabs from "../hooks/useTabs";
 
 function TabPanesContainer() {
-  const { tabs, sections } = useTabs();
+  const { tabs, sections, activeKey } = useTabs();
 
   const flattenTabs = useMemo(() => {
     let flatten = tabs ? [...tabs] : [];
@@ -23,7 +23,9 @@ function TabPanesContainer() {
   return (
     <div>
       {flattenTabs.map((t) => (
-        <TabPane id={t.id} tab={t} />
+        <TabPane key={t.key} active={activeKey === t.key}>
+          TabPane content
+        </TabPane>
       ))}
     </div>
   );
