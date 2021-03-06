@@ -7,7 +7,8 @@ const bemTab = bem("tab");
 export type TabProps = {
   title: Tab["title"];
   active: boolean;
-};
+  onClick?: () => void;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, "title">;
 
 function TabComponent({ title, active, ...rest }: TabProps) {
   return (

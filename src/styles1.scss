@@ -5,6 +5,11 @@ $tabs-height: 50px;
 $tabs-background-color: #2e3440;
 $tabs-font-color: #e5e9f0;
 
+body {
+  background-color: #434c5e;
+  font-family: "Roboto", sans-serif;
+}
+
 .tabs {
   display: flex;
   position: relative;
@@ -28,10 +33,15 @@ $tabs-font-color: #e5e9f0;
     // color: var(--text-primary-color);
     background-color: $nord1;
   }
+
+  &_dropdown {
+    position: relative;
+  }
 }
 
 .dropdown-menu {
   cursor: auto;
+  z-index: 10;
   position: absolute;
   top: $tabs-height;
   left: 0;

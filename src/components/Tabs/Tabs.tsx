@@ -2,30 +2,29 @@ import React, { useCallback, useMemo, useState } from "react";
 import TabComponent from "./TabComponent";
 import bem from "../../helpers/bem";
 import DropdownTabComponent from "./DropdownTab/DropdownTabComponent";
-import { Section, Tab } from "./types";
-import useTabs from "./hooks/useTabs";
-// import { TabsInnerContextProvider } from "./TabContent";
+import { Section, Tab, TabKey } from "./types";
 
 const bemTabs = bem("tabs");
 
 export type TabsProps = {
-  // tabs: Tab[];
-  // sections: Section[];
-  defaultActiveKey: Tab["key"];
+  tabs: Tab[];
+  sections: Section[];
+  onChange: (key: TabKey | null) => void;
+  onDropdownTabClose: (key: TabKey) => void;
+  activeKey?: TabKey | null;
+  defaultActiveKey?: TabKey;
 };
 
 function TabsComponent({
-  // tabs,
-  // sections,
+  tabs,
+  sections,
   onChange: onChangeProp,
+  onDropdownTabClose,
   activeKey: activeKeyProp,
   defaultActiveKey,
-}: // defaultDropdownKey,
-TabsProps) {
-  // const { sections, activeKey, onTabClose, removeTabs } = useTabs();
-
+}: TabsProps) {
   const [activeKeyInner, setActiveKeyInner] = useState(() =>
-    activeKey !== undefined ? activeKey : defaultActiveKey ?? null
+    activeKeyProp !== undefined ? activeKeyProp : defaultActiveKey ?? null
   );
 
   const onChange = useCallback(
@@ -63,7 +62,7 @@ TabsProps) {
           activeKey={activeTabKey}
           onChange={onChange}
           sections={sections}
-          defaultKey={defaultDropdownKey}
+          defaultKey={defaultActiveKey}
         />
       )}
       {/* <Slider /> */}
@@ -71,12 +70,12 @@ TabsProps) {
   );
 }
 
-function Slider(props) {
-  const style = {
-    width: 80,
-  };
-
-  return <span class="tabs__slider" {...props} style={style}></span>;
-}
+// function Slider(props) {
+//   const style = {
+//     width: 80,
+//   };
+//
+//   return <span class="tabs__slider" {...props} style={style}></span>;
+// }
 
 export default TabsComponent;

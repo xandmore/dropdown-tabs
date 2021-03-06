@@ -19,9 +19,9 @@ export interface State {
 
 export enum ActionType {
   SetActiveKey,
-  CloseTabs,
-  RemoveTabs,
   AddTabs,
+  RemoveTabs,
+  CloseTabs,
   LockTabs,
   StarTabs,
   SetState,

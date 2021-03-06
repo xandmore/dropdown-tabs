@@ -12,7 +12,7 @@ export type TabPaneProps = {
 function TabPane({ className, active, children }: TabPaneProps) {
   return (
     <div
-      className={bemTabPane({ active: active }, [className])}
+      className={bemTabPane({ active: active, hidden: !active }, [className])}
       role="tabpanel"
     >
       {children}

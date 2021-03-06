@@ -1,17 +1,22 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import DropdownMenu from "../DropdownTabMenu/DropdownTabMenu";
 import bem from "../../../helpers/bem";
 import { DropdownTab, Section, TabKey } from "../types";
+import useWatchOutsideClick from "../DropdownTabMenu/hooks/useWatchOutsideClick";
 
 const bemTab = bem("tab");
 
-export type DropdownTabKey = TabKey | Symbol;
-
 export type DropdownTabProps = {
-  onChange: (key: DropdownTabKey) => void;
+  onChange: (key: TabKey) => void;
   sections: Section[];
-  activeKey: DropdownTabKey;
-  defaultKey?: TabKey | null;
+  activeKey: TabKey | null;
+  defaultKey?: TabKey;
   placeholder?: React.ReactNode;
 };
 
@@ -25,24 +30,18 @@ function DropdownTabComponent({
   const [isOpen, setIsOpen] = useState(false);
 
   const [activeTabInfo, setActiveTabInfo] = useState(() => {
-    if (isSymbol(activeKey)) {
-      return null;
-    } else {
-      return (
-        getTabByKey(activeKey, sections) || getTabByKey(defaultKey!, sections)
-      );
-    }
+    return getTabByKey(activeKey !== null ? activeKey : defaultKey, sections);
   });
 
   useEffect(() => {
     setActiveTabInfo((tab) => {
-      return getTabByKey(activeKey, sections) ?? tab;
+      return (
+        getTabByKey(activeKey, sections) ?? getTabByKey(tab?.key, sections)
+      );
     });
   }, [sections, activeKey]);
 
-  const isActive =
-    activeKey === Symbol.for("dropdownTab") ||
-    !!getTabByKey(activeKey, sections);
+  const isActive = activeTabInfo?.key === activeKey;
 
   console.log("activeKey", activeKey);
   console.log("activeTabInfo", activeTabInfo);
@@ -73,18 +72,26 @@ function DropdownTabComponent({
     }
   }, [isActive]);
 
-  const title = activeTabInfo?.title ?? placeholder;
-
   const onSelectTab = useCallback(
-    (tabKey: DropdownTabKey) => {
+    (tabKey: TabKey) => {
       onChange?.(tabKey);
       setIsOpen(false);
     },
     [onChange]
   );
 
+  const title = activeTabInfo?.title ?? placeholder;
+  const tabRef = useRef<HTMLDivElement>(null);
+
+  const closeOutsideClick = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  useWatchOutsideClick(tabRef, closeOutsideClick);
+
   return (
     <div
+      ref={tabRef}
       className={bemTab({ active: isActive })}
       style={{ position: "relative" }}
       onClick={onClick}
@@ -102,7 +109,7 @@ function DropdownTabComponent({
   );
 }
 
-function getTabByKey(key: DropdownTabKey, sections: Section[]) {
+function getTabByKey(key: TabKey | null | undefined, sections: Section[]) {
   if (isSymbol(key)) {
     return null;
   }
