@@ -1,9 +1,22 @@
 @import "node_modules/nord/src/sass/nord";
 @import "./components/Tabs/TabPane/TabPane.scss";
 
-$tabs-height: 50px;
-$tabs-background-color: #2e3440;
-$tabs-font-color: #e5e9f0;
+$tabs-height: 40px;
+//$tabs-background-color: #2e3440;
+$tabs-background-color: #f6f7f9;
+//$tabs-font-color: #e5e9f0;
+$tabs-font-color: #002b5d;
+$tabs-slider-height: 3px;
+$tabs-outer-border-color: #91a1bb;
+$tabs-outer-border-width: 1px;
+
+$tab-active-background-color: #fff;
+$tab-hover-background-color: #eee;
+
+$tab-color: #91a1bb;
+$tab-color-active: #002b5d;
+
+$tab-slider-color: #21bed5;
 
 body {
   background-color: #434c5e;
@@ -14,8 +27,23 @@ body {
   display: flex;
   position: relative;
   height: $tabs-height;
-  background-color: $tabs-background-color;
   color: $tabs-font-color;
+  border: $tabs-outer-border-width solid $tabs-outer-border-color;
+  background-color: $tabs-background-color;
+  box-sizing: border-box;
+
+  &-slider {
+    height: 3px;
+    width: 50px;
+    background: $tab-slider-color;
+    position: absolute;
+    z-index: 1;
+    top: $tabs-height - $tabs-outer-border-width - $tabs-slider-height;
+    user-select: none;
+    will-change: left;
+    left: 0;
+    transition: 0.3s ease;
+  }
 }
 
 .tab {
@@ -24,14 +52,16 @@ body {
   padding: 0 16px;
   cursor: pointer;
   user-select: none;
+  color: $tab-color;
 
   &:hover {
-    background-color: $nord2;
+    background-color: $tab-hover-background-color;
   }
 
   &_active {
     // color: var(--text-primary-color);
-    background-color: $nord1;
+    color: $tabs-font-color;
+    background-color: $tab-active-background-color;
   }
 
   &_dropdown {

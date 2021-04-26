@@ -1,11 +1,27 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, {
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import TabComponent from "./TabComponent";
 import bem from "../../helpers/bem";
 import DropdownTabComponent from "./DropdownTab/DropdownTabComponent";
 import { Section, Tab, TabKey } from "./types";
+import Slider from "./Slider/Slider";
+import getDropdownTabByKey from "./utils/getDropdownTabByKey";
+import useSlider from "./Tabs/hooks/useSlider";
 
 const bemTabs = bem("tabs");
 
+type SliderRenderingInfo = {
+  keys: string;
+  tabsElements: Record<Tab["key"], HTMLDivElement | null>;
+};
+
+let rerender = 0;
 export type TabsProps = {
   tabs: Tab[];
   sections: Section[];
@@ -46,12 +62,31 @@ function TabsComponent({
     [sections]
   );
 
+  const { elementsRef, sliderDisplayInfo } = useSlider(activeTabKey, sections);
+
+  // const allKeysJoined = useMemo(() => {
+  //   return tabs
+  //     .map((t) => t.key)
+  //     .concat(sections.flatMap((s) => s.tabs.map((t) => t.key)))
+  //     .join(";");
+  // }, [tabs, sections]);
+  //
+  // if (allKeysJoined !== tabsRef.current.keys) {
+  //   console.log("set", allKeysJoined);
+  //   tabsRef.current.keys = allKeysJoined;
+  // }
+
+  console.log("RERENDER", rerender++);
+
   return (
     <div className="tabs">
       {tabs.map((t) => (
         <TabComponent
           key={t.key}
           title={t.title}
+          ref={(el) => {
+            elementsRef.current.tabsElements[t.key] = el;
+          }}
           onClick={() => onChange(t.key)}
           active={activeTabKey === t.key}
         />
@@ -59,23 +94,18 @@ function TabsComponent({
 
       {isDropdownTabDisplayed && (
         <DropdownTabComponent
+          ref={(el) => (elementsRef.current.dropdownTabElement = el)}
           activeKey={activeTabKey}
           onChange={onChange}
           sections={sections}
           defaultKey={defaultActiveKey}
         />
       )}
-      {/* <Slider /> */}
+
+      {sliderDisplayInfo.isDisplayed && (
+        <Slider left={sliderDisplayInfo.left} width={sliderDisplayInfo.width} />
+      )}
     </div>
   );
 }
-
-// function Slider(props) {
-//   const style = {
-//     width: 80,
-//   };
-//
-//   return <span class="tabs__slider" {...props} style={style}></span>;
-// }
-
 export default TabsComponent;

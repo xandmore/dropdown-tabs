@@ -10,12 +10,19 @@ export type TabProps = {
   onClick?: () => void;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "title">;
 
-function TabComponent({ title, active, ...rest }: TabProps) {
-  return (
-    <div className={bemTab({ active: active })} role="tab" {...rest}>
-      {title}
-    </div>
-  );
-}
+const TabComponent = React.forwardRef<HTMLDivElement, TabProps>(
+  function TabComponent({ title, active, ...rest }, ref) {
+    return (
+      <div
+        ref={ref}
+        className={bemTab({ active: active })}
+        role="tab"
+        {...rest}
+      >
+        {title}
+      </div>
+    );
+  }
+);
 
 export default TabComponent;

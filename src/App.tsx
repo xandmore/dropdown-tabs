@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./styles1.scss";
 
 import { Section } from "./components/Tabs/types";
-import { TabsContextProvider } from "./components/Tabs/TabsContext/TabsContext";
+import {
+  TabsContext,
+  TabsContextProvider,
+} from "./components/Tabs/TabsContext/TabsContext";
 import TabsWithContext from "./components/TabsWithContext";
 import TabPanesContainer from "./components/Tabs/TabPane/TabPanesContaner";
 import TabPane from "./components/Tabs/TabPane/TabPane";
@@ -11,6 +14,10 @@ export default function App() {
   const tabs = [
     {
       key: "0",
+      title: "Normal Tab",
+    },
+    {
+      key: "1",
       title: "Normal Tab",
     },
   ];
@@ -58,7 +65,38 @@ export default function App() {
       <main>
         <TabsWithContext />
         <TabPanesContainer />
+        <Buttons />
       </main>
     </TabsContextProvider>
+  );
+}
+
+function Buttons() {
+  const c = useContext(TabsContext);
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          c.addTabs({
+            tabs: [
+              {
+                key: "2",
+                title: "Tab 2",
+              },
+            ],
+          });
+        }}
+      >
+        Add
+      </button>
+      <button
+        onClick={() => {
+          c.removeTabs(["2"]);
+        }}
+      >
+        Remove
+      </button>
+    </div>
   );
 }

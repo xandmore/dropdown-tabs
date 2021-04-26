@@ -50,9 +50,7 @@ function TabPanesContainer({
         style={{ transform: `translateX(-${shift}00%)` }}
       >
         {flattenTabs.map((t, i) => (
-          <TabPane key={t.key} active={activeKey === t.key}>
-            TabPane content {i}
-          </TabPane>
+          <TabPane key={t.key} active={activeKey === t.key} tab={t} />
         ))}
       </div>
     </div>
