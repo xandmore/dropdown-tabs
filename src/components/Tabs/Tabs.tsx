@@ -1,27 +1,15 @@
-import React, {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import TabComponent from "./TabComponent";
-import bem from "../../helpers/bem";
 import DropdownTabComponent from "./DropdownTab/DropdownTabComponent";
 import { Section, Tab, TabKey } from "./types";
 import Slider from "./Slider/Slider";
-import getDropdownTabByKey from "./utils/getDropdownTabByKey";
 import useSlider from "./Tabs/hooks/useSlider";
-
-const bemTabs = bem("tabs");
 
 type SliderRenderingInfo = {
   keys: string;
   tabsElements: Record<Tab["key"], HTMLDivElement | null>;
 };
 
-let rerender = 0;
 export type TabsProps = {
   tabs: Tab[];
   sections: Section[];
@@ -62,21 +50,11 @@ function TabsComponent({
     [sections]
   );
 
-  const { elementsRef, sliderDisplayInfo } = useSlider(activeTabKey, sections);
-
-  // const allKeysJoined = useMemo(() => {
-  //   return tabs
-  //     .map((t) => t.key)
-  //     .concat(sections.flatMap((s) => s.tabs.map((t) => t.key)))
-  //     .join(";");
-  // }, [tabs, sections]);
-  //
-  // if (allKeysJoined !== tabsRef.current.keys) {
-  //   console.log("set", allKeysJoined);
-  //   tabsRef.current.keys = allKeysJoined;
-  // }
-
-  console.log("RERENDER", rerender++);
+  const {
+    elementsRef,
+    sliderDisplayInfo,
+    onDropdownTabWidthChange,
+  } = useSlider(activeTabKey, sections);
 
   return (
     <div className="tabs">
@@ -99,6 +77,7 @@ function TabsComponent({
           onChange={onChange}
           sections={sections}
           defaultKey={defaultActiveKey}
+          onWidthChange={onDropdownTabWidthChange}
         />
       )}
 

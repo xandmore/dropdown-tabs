@@ -1,6 +1,6 @@
 import getDropdownTabByKey from "../../utils/getDropdownTabByKey";
 import { Section, Tab, TabKey } from "../../types";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 export type SliderRenderingInfo = {
   tabsElements: Record<Tab["key"], HTMLDivElement | null>;
@@ -13,97 +13,71 @@ export type SlideDisplayInfo = {
   left: number;
 };
 
+const defaultDiplayInfo: SlideDisplayInfo = {
+  isDisplayed: false,
+  width: 0,
+  left: 0,
+};
+
 function useSlider(activeTabKey: TabKey | null, sections: Section[]) {
-  // console.log("useSlider", activeTabKey);
   const elementsRef = useRef<SliderRenderingInfo>({
     tabsElements: {},
     dropdownTabElement: null,
   });
 
-  // window.requestAnimationFrame(() => {
-  //   console.log("Requested");
-  // });
-
-  const displayInfoRef = useRef<SlideDisplayInfo>(null);
-  const [, forceRerender] = useState<SlideDisplayInfo>({
+  const [displayInfo, setDisplayInfo] = useState<SlideDisplayInfo>({
     isDisplayed: false,
     width: 0,
     left: 0,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
-    if (activeTabKey != null) {
-      console.log(
-        "layout",
-        elementsRef.current.dropdownTabElement?.clientWidth
+    if (activeTabKey == null) {
+      setDisplayInfo((d) =>
+        isEqual(d, defaultDiplayInfo) ? d : defaultDiplayInfo
       );
+      return;
     }
-  });
 
-  useEffect(() => {
-    if (activeTabKey != null) {
-      console.log(
-        "use effect ",
-        elementsRef.current.dropdownTabElement?.clientWidth,
-        elementsRef.current.dropdownTabElement?.getBoundingClientRect(),
-        elementsRef.current.dropdownTabElement
-      );
+    let tabElement = elementsRef.current.tabsElements[activeTabKey];
+
+    if (!tabElement) {
+      const isDropdownTab = !!getDropdownTabByKey(activeTabKey, sections)?.tab;
+      tabElement = isDropdownTab
+        ? elementsRef.current.dropdownTabElement
+        : null;
     }
-  });
 
-  if (activeTabKey == null) {
-    const displayInfo: SlideDisplayInfo = {
-      isDisplayed: false,
-      width: 0,
-      left: 0,
+    const newDisplayInfo: SlideDisplayInfo = {
+      isDisplayed: !!tabElement,
+      width: tabElement?.getBoundingClientRect().width ?? 0,
+      left: tabElement?.offsetLeft ?? 0,
     };
 
-    // forceRerender((s) => {
-    //   console.log("!!!!!!!!" + isEqual(s, displayInfo));
-    //   return s;
-    // });
-    //
-    // forceRerender((s) => {
-    //   return isEqual(s, displayInfo) ? s : displayInfo;
-    // });
+    setDisplayInfo((d) => (isEqual(d, newDisplayInfo) ? d : newDisplayInfo));
+  });
 
-    return {
-      elementsRef,
-      sliderDisplayInfo: displayInfo,
-    };
-  }
-
-  let tabElement = elementsRef.current.tabsElements[activeTabKey];
-
-  if (!tabElement) {
-    const isDropdownTab = !!getDropdownTabByKey(activeTabKey, sections);
-    tabElement = isDropdownTab ? elementsRef.current.dropdownTabElement : null;
-  }
-
-  const displayInfo: SlideDisplayInfo = {
-    isDisplayed: !!tabElement,
-    width: tabElement?.clientWidth ?? 0,
-    left: tabElement?.offsetLeft ?? 0,
-  };
-
-  // if (displayInfo)
-  // setSliderDisplayInfo((s) => {
-  //   return isEqual(s, displayInfo) ? s : displayInfo;
-  // });
-
-  // forceRerender((s) => {
-  //   console.log("!!!!!!!!" + isEqual(s, displayInfo));
-  //   return s;
-  // });
+  const onDropdownTabWidthChange = useCallback(() => {
+    setDisplayInfo((prev) => {
+      return {
+        ...prev,
+        width:
+          elementsRef.current.dropdownTabElement?.getBoundingClientRect()
+            .width ?? 0,
+        left: elementsRef.current.dropdownTabElement?.offsetLeft ?? 0,
+      };
+    });
+  }, []);
 
   return {
     elementsRef,
     sliderDisplayInfo: displayInfo,
+    onDropdownTabWidthChange: onDropdownTabWidthChange,
   };
 }
 
 function isEqual(obj1: SlideDisplayInfo, obj2: SlideDisplayInfo) {
-  console.log(obj1, obj2);
   return (
     obj1.isDisplayed === obj2.isDisplayed &&
     obj1.left === obj2.left &&

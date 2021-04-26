@@ -1,5 +1,4 @@
 import React from "react";
-import bem from "../../../helpers/bem";
 
 export type SliderProps = {
   left: number;

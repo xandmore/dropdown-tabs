@@ -19,11 +19,19 @@ export type DropdownTabProps = {
   activeKey: TabKey | null;
   defaultKey?: TabKey;
   placeholder?: React.ReactNode;
+  onWidthChange: (width: number) => void;
 };
 
 const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
   function DropdownTabComponent(
-    { onChange, sections, activeKey, defaultKey, placeholder = "Active Tabs" },
+    {
+      onWidthChange,
+      onChange,
+      sections,
+      activeKey,
+      defaultKey,
+      placeholder = "Active Tabs",
+    },
     ref
   ) {
     const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +87,9 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
     );
 
     const title = activeTabInfo?.title ?? placeholder;
-    const innerTabRef = useRef<HTMLDivElement | null>(null);
+
+    const prevTabWidth = useRef<number | null>(null);
+    const innerTabRef = useRef<HTMLDivElement>({} as HTMLDivElement);
 
     const closeOutsideClick = useCallback(() => {
       setIsOpen(false);
@@ -88,7 +98,11 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
     useWatchOutsideClick(innerTabRef, closeOutsideClick);
 
     useLayoutEffect(() => {
-      console.log("!!! DD tab rerendered", innerTabRef.current?.clientWidth);
+      const width = innerTabRef.current.clientWidth ?? 0;
+      if (prevTabWidth.current !== width) {
+        prevTabWidth.current = width;
+        onWidthChange?.(width);
+      }
     });
 
     return (
@@ -102,7 +116,7 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
             }
           }
 
-          innerTabRef.current = el;
+          innerTabRef.current = el as HTMLDivElement;
         }}
         className={bemTab({ active: isActive })}
         style={{ position: "relative" }}

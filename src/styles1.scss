@@ -20,7 +20,7 @@ $tab-slider-color: #21bed5;
 
 body {
   background-color: #434c5e;
-  font-family: "Roboto", sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 .tabs {
@@ -42,24 +42,26 @@ body {
     user-select: none;
     will-change: left;
     left: 0;
-    transition: 0.3s ease;
+    transition: left 0.3s ease;
   }
 }
 
 .tab {
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 32px;
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
   user-select: none;
   color: $tab-color;
+  transition: color 0.2s ease;
 
   &:hover {
     background-color: $tab-hover-background-color;
   }
 
   &_active {
-    // color: var(--text-primary-color);
     color: $tabs-font-color;
     background-color: $tab-active-background-color;
   }

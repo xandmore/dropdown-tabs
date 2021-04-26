@@ -14,11 +14,7 @@ export default function App() {
   const tabs = [
     {
       key: "0",
-      title: "Normal Tab",
-    },
-    {
-      key: "1",
-      title: "Normal Tab",
+      title: "OVERVIEW",
     },
   ];
 
