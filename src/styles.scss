@@ -33,6 +33,7 @@ $tab-hover-background-color: #eee; // unknown
 
 $tab-color-active: $font-color;
 $dropdown-menu-color: $font-color;
+$dropdown-menu-item-height: 40px;
 
 html {
   box-sizing: border-box;
@@ -165,7 +166,7 @@ body {
 }
 
 @mixin padding-and-width {
-  height: 40px;
+  height: $dropdown-menu-item-height;
   padding: 0 16px;
 }
 
@@ -179,6 +180,8 @@ body {
   background: #fff;
   box-shadow: 0 3px 6px rgba(#000, 0.16);
   width: 100%;
+  max-height: $dropdown-menu-item-height * 7;
+  overflow-y: auto;
 
   &__section {
     list-style: none;
