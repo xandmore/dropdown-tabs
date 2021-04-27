@@ -1,6 +1,6 @@
 import React from "react";
 import useTabs from "../components/Tabs/hooks/useTabs";
-import Tabs from "../components/Tabs/Tabs";
+import Tabs from "./Tabs/Tabs/Tabs";
 
 function TabsWithContext() {
   const { tabs, sections, activeKey, setActiveKey, onTabClose } = useTabs();

@@ -32,7 +32,7 @@ export type PayloadType = {
   [ActionType.CloseTabs]: { key: TabKey; newActiveKey?: TabKey };
   [ActionType.AddTabs]: {
     tabs?: Tab[];
-    dropdownTabs?: Record<DropdownTab["key"], DropdownTab[]>;
+    dropdownTabs?: Record<Section["key"], DropdownTab[]>;
   };
   [ActionType.RemoveTabs]: TabKey | TabKey[];
   [ActionType.LockTabs]: { keys: TabKey | TabKey[]; mode: TabLockAction };

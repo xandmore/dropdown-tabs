@@ -7,6 +7,7 @@ import {
 } from "./components/Tabs/TabsContext/TabsContext";
 import TabsWithContext from "./components/TabsWithContext";
 import TabPanesContainer from "./components/Tabs/TabPane/TabPanesContaner";
+import getDropdownTabByKey from "./components/Tabs/utils/getDropdownTabByKey";
 
 export default function App() {
   const tabs = [
@@ -35,13 +36,11 @@ export default function App() {
     },
     {
       key: "s1",
-      title:
-        "Another Section Another Section Another Section Another Section Another Section Another Section",
+      title: new Array(10).fill("Long Section Title").join(" "),
       tabs: [
         {
           key: "dropdownTab2",
-          title:
-            "Another Section Item 1 Another Section Item 1 Another Section Item 1 Another Section Item 1",
+          title: new Array(10).fill("Dropdown menu item 2").join(" "),
           starred: true,
         },
         {
@@ -73,32 +72,68 @@ export default function App() {
   );
 }
 
+let newTabsCounter = 10;
 function Buttons() {
-  const c = useContext(TabsContext);
+  const {
+    activeKey,
+    setActiveKey,
+    toggleStar,
+    toggleLock,
+    sections,
+    closeDropdownTab,
+    addTabs,
+  } = useContext(TabsContext);
+
+  const onToggleStar = () => {
+    if (activeKey) {
+      toggleStar(activeKey);
+    }
+  };
+
+  const onToggleLock = () => {
+    if (activeKey) {
+      toggleLock(activeKey);
+    }
+  };
+
+  const onCloseDropdown = () => {
+    if (activeKey) {
+      closeDropdownTab(activeKey);
+    }
+  };
+
+  const isDropdownTab = !!getDropdownTabByKey(activeKey, sections)?.tab;
+
+  const onAdd = () => {
+    const key = `dropdownTab${newTabsCounter++}`;
+    addTabs({
+      dropdownTabs: {
+        s0: [
+          {
+            key: key,
+            title: "New Tab",
+          },
+        ],
+      },
+    });
+
+    setActiveKey(key);
+  };
 
   return (
     <div>
-      <button
-        onClick={() => {
-          c.addTabs({
-            tabs: [
-              {
-                key: "2",
-                title: "Tab 2",
-              },
-            ],
-          });
-        }}
-      >
-        Add
+      <h2>Change dropdown tab</h2>
+
+      <button disabled={!isDropdownTab} onClick={onToggleStar}>
+        Toggle Star
       </button>
-      <button
-        onClick={() => {
-          c.removeTabs(["2"]);
-        }}
-      >
-        Remove
+      <button disabled={!isDropdownTab} onClick={onToggleLock}>
+        Toggle Lock
       </button>
+      <button disabled={!isDropdownTab} onClick={onCloseDropdown}>
+        Close
+      </button>
+      <button onClick={onAdd}>Add</button>
     </div>
   );
 }

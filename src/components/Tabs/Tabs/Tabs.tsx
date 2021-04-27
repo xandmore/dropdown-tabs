@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
 import TabComponent from "./TabComponent";
-import DropdownTabComponent from "./DropdownTab/DropdownTabComponent";
-import { Section, Tab, TabKey } from "./types";
-import Slider from "./Slider/Slider";
-import useSlider from "./Tabs/hooks/useSlider";
+import DropdownTabComponent from "../DropdownTab/DropdownTabComponent";
+import { Section, Tab, TabKey } from "../types";
+import Slider from "../Slider/Slider";
+import useSlider from "./hooks/useSlider";
 
 export type TabsProps = {
   tabs: Tab[];

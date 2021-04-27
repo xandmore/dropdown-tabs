@@ -1,6 +1,6 @@
 import React from "react";
-import bem from "../../helpers/bem";
-import { Tab } from "./types";
+import bem from "../../../helpers/bem";
+import { Tab } from "../types";
 
 const bemTab = bem("tab");
 
