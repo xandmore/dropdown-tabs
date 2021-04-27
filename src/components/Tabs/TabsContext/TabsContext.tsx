@@ -16,7 +16,7 @@ type TabsContextProps = {
 
   addTabs: (payload: PayloadType[ActionType.AddTabs]) => void;
   removeTabs: (keys: TabKey | TabKey[]) => void;
-  closeDropdownTab: (keys: TabKey, newActiveTab: TabKey) => void;
+  closeDropdownTab: (keys: TabKey, newActiveTab?: TabKey) => void;
   onTabClose: (key: TabKey) => void;
 
   lockTabs: (keys: TabKey | TabKey[]) => void;

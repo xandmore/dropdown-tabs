@@ -4,6 +4,7 @@ import { DropdownTab, Section, TabKey } from "../types";
 import { ReactComponent as CloseIcon } from "../../../assets/close_24dp.svg";
 import { ReactComponent as LockIcon } from "../../../assets/lock_24dp.svg";
 import { ReactComponent as StarIcon } from "../../../assets/star_outline_24dp.svg";
+import useTabs from "../hooks/useTabs";
 
 const bemMenu = bem("dropdown-menu");
 const bemMenuItem = bem("dropdown-menu-item");
@@ -58,7 +59,8 @@ function DropdownMenuSection({
       <ul className={bemMenu("section")}>
         {tabs?.map((tab) => (
           <DropdownMenuItem
-            {...tab}
+            key={tab.key}
+            tab={tab}
             onClick={() => onChange(tab.key)}
             active={activeKey === tab.key}
           />
@@ -69,22 +71,21 @@ function DropdownMenuSection({
 }
 
 export type DropdownMenuItemProps = {
-  active: boolean;
-  disabled?: boolean;
-  title: DropdownTab["title"];
-  locked?: boolean;
-  starred?: boolean;
+  tab: DropdownTab;
   onClick: () => void;
+  disabled?: boolean;
+  active: boolean;
 };
 
 function DropdownMenuItem({
+  tab,
+  onClick,
   active,
   disabled,
-  title,
-  locked,
-  starred,
-  onClick,
 }: DropdownMenuItemProps) {
+  const { closeDropdownTab } = useTabs();
+  const { locked, starred, title } = tab;
+
   return (
     <li
       className={bemMenuItem({
@@ -110,6 +111,10 @@ function DropdownMenuItem({
 
       {!locked && (
         <CloseIcon
+          onClick={(e) => {
+            e.stopPropagation();
+            closeDropdownTab(tab.key);
+          }}
           className={bemIcon({ small: true }, [bemMenuItem("close-icon")])}
         />
       )}

@@ -11,7 +11,6 @@ export type TabPaneProps = {
 };
 
 function TabPane({ className, active, tab }: TabPaneProps) {
-  console.log(tab.title + " rerendered");
   return (
     <div
       className={bemTabPane({ active: active, hidden: !active }, [className])}

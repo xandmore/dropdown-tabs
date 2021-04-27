@@ -5,11 +5,6 @@ import { Section, Tab, TabKey } from "./types";
 import Slider from "./Slider/Slider";
 import useSlider from "./Tabs/hooks/useSlider";
 
-type SliderRenderingInfo = {
-  keys: string;
-  tabsElements: Record<Tab["key"], HTMLDivElement | null>;
-};
-
 export type TabsProps = {
   tabs: Tab[];
   sections: Section[];
