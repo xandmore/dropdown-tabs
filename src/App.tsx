@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import "./styles1.scss";
 
 import { Section } from "./components/Tabs/types";
 import {
@@ -8,7 +7,6 @@ import {
 } from "./components/Tabs/TabsContext/TabsContext";
 import TabsWithContext from "./components/TabsWithContext";
 import TabPanesContainer from "./components/Tabs/TabPane/TabPanesContaner";
-import TabPane from "./components/Tabs/TabPane/TabPane";
 
 export default function App() {
   const tabs = [
@@ -37,11 +35,19 @@ export default function App() {
     },
     {
       key: "s1",
-      title: "Another Section",
+      title:
+        "Another Section Another Section Another Section Another Section Another Section Another Section",
       tabs: [
         {
           key: "dropdownTab2",
-          title: "Another Section Item 1",
+          title:
+            "Another Section Item 1 Another Section Item 1 Another Section Item 1 Another Section Item 1",
+          starred: true,
+        },
+        {
+          key: "dropdownTab3",
+          title: "Dropdown tab 3",
+          locked: true,
         },
       ],
     },
@@ -58,7 +64,7 @@ export default function App() {
       initialTabs={tabs}
       initialSections={sections}
     >
-      <main>
+      <main style={{ padding: 100 }}>
         <TabsWithContext />
         <TabPanesContainer />
         <Buttons />

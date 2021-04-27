@@ -1,25 +1,38 @@
-@import "node_modules/nord/src/sass/nord";
 @import "./components/Tabs/TabPane/TabPane.scss";
 @use "sass:color";
 
+// base colors
+$color-turquoise: #21bed5;
+$color-orange: #ffa850;
+$color-dark-blue: #002b5d;
+$color-grey-1: #91a1bb;
+$color-grey-2: #f6f7f9;
+$color-grey-3: #cacfd9;
+
+$font-color: $color-dark-blue;
+$border-color: $color-grey-3;
+
+$color-inactive: $color-grey-1;
+
+// icons
+$icon-size-normal: 24px;
+$icon-size-small: 18px;
+
+// tabs
 $tabs-height: 40px;
-$tabs-background-color: #f6f7f9;
-$tabs-font-color: #002b5d;
-$tabs-slider-height: 3px;
-$tabs-outer-border-color: #91a1bb;
+$tabs-background-color: $color-grey-2;
+$tabs-font-color: $color-inactive;
+$tabs-outer-border-color: $color-grey-1;
 $tabs-outer-border-width: 1px;
 
+$tabs-slider-height: 3px;
+$tabs-slider-color: $color-turquoise;
+
 $tab-active-background-color: #fff;
-$tab-hover-background-color: #eee;
+$tab-hover-background-color: #eee; // unknown
 
-$tab-color: #91a1bb;
-$tab-color-active: $tabs-font-color;
-$dropdown-menu-color: $tabs-font-color;
-
-$tab-slider-color: #21bed5;
-$orange: #ffa850;
-
-$border-color: #cacfd9;
+$tab-color-active: $font-color;
+$dropdown-menu-color: $font-color;
 
 html {
   box-sizing: border-box;
@@ -47,7 +60,7 @@ body {
   &-slider {
     height: 3px;
     width: 50px;
-    background: $tab-slider-color;
+    background: $tabs-slider-color;
     position: absolute;
     z-index: 1;
     bottom: -$tabs-outer-border-width;
@@ -66,7 +79,6 @@ body {
   font-size: 12px;
   font-weight: 600;
   user-select: none;
-  color: $tab-color;
   transition: color 0.2s ease;
   border-bottom: 2px solid $border-color;
 
@@ -83,7 +95,7 @@ body {
   }
 
   &_active {
-    color: $tabs-font-color;
+    color: $tab-color-active;
     background-color: $tab-active-background-color;
   }
 
@@ -131,23 +143,23 @@ body {
 
     &_lock {
       grid-area: lock;
-      background: $tab-slider-color;
+      background: $tabs-slider-color;
     }
 
     &_star {
       grid-area: star;
-      background: $orange;
+      background: $color-orange;
     }
   }
 
   &__dropdown-icon {
     grid-area: icon;
+    color: $color-grey-1;
     transition: 0.2s ease;
-    transform-origin: center;
     justify-self: center;
 
     &_open {
-      transform: rotate(60deg);
+      transform: rotate(180deg);
     }
   }
 }
@@ -181,10 +193,6 @@ body {
     display: flex;
     align-items: center;
   }
-
-  &__section-title-text {
-    vertical-align: center;
-  }
 }
 
 .dropdown-menu-item {
@@ -192,7 +200,7 @@ body {
 
   display: grid;
   grid-template-areas: "star lock title close";
-  grid-template-columns: 16px 16px 1fr 24px;
+  grid-template-columns: $icon-size-small $icon-size-small 1fr $icon-size-normal;
   align-items: center;
   cursor: pointer;
   font-weight: 400;
@@ -203,18 +211,36 @@ body {
 
   &__title {
     grid-area: title;
+    margin-left: 4px;
   }
 
   &__star-icon {
     grid-area: star;
+    color: $color-orange;
   }
 
   &__lock-icon {
     grid-area: lock;
+    color: $color-turquoise;
   }
 
   &__close-icon {
     grid-area: close;
     justify-self: end;
+    color: $color-inactive;
+
+    &:hover {
+      color: lighten($color-inactive, 8%);
+    }
+  }
+}
+
+.icon {
+  width: $icon-size-normal;
+  height: $icon-size-normal;
+
+  &_small {
+    width: $icon-size-small;
+    height: $icon-size-small;
   }
 }

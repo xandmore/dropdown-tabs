@@ -1,8 +1,13 @@
 import React from "react";
 import bem from "../../../helpers/bem";
 import { DropdownTab, Section, TabKey } from "../types";
+import { ReactComponent as CloseIcon } from "../../../assets/close_24dp.svg";
+import { ReactComponent as LockIcon } from "../../../assets/lock_24dp.svg";
+import { ReactComponent as StarIcon } from "../../../assets/star_outline_24dp.svg";
+
 const bemMenu = bem("dropdown-menu");
 const bemMenuItem = bem("dropdown-menu-item");
+const bemIcon = bem("icon");
 
 export type DropdownMenuProps = {
   onChange: (key: TabKey) => void;
@@ -46,11 +51,9 @@ function DropdownMenuSection({
   activeKey,
 }: DropdownMenuSectionProps) {
   return (
-    <div className={bemMenu("section")}>
+    <>
       <div className={bemMenu("section-title")}>
-        <span className={bemMenu("section-title-text", ["text-truncate"])}>
-          {title}
-        </span>
+        <span className={"text-truncate"}>{title}</span>
       </div>
       <ul className={bemMenu("section")}>
         {tabs?.map((tab) => (
@@ -61,7 +64,7 @@ function DropdownMenuSection({
           />
         ))}
       </ul>
-    </div>
+    </>
   );
 }
 
@@ -92,41 +95,23 @@ function DropdownMenuItem({
       onClick={disabled ? undefined : onClick}
     >
       {starred && (
-        <span
-          role="img"
-          aria-label="Starred"
-          className={bemMenuItem("star-icon")}
-        >
-          ⭐
-        </span>
+        <StarIcon
+          className={bemIcon({ small: true }, [bemMenuItem("star-icon")])}
+        />
       )}
+
       {locked && (
-        <span
-          role="img"
-          aria-label="Locked"
-          className={bemMenuItem("lock-icon")}
-        >
-          🔒
-        </span>
+        <LockIcon
+          className={bemIcon({ small: true }, [bemMenuItem("lock-icon")])}
+        />
       )}
+
       <span className={bemMenuItem("title", ["text-truncate"])}>{title}</span>
-      {locked && (
-        <span
-          role="img"
-          aria-label="Locked"
-          className={bemMenuItem("lock-icon")}
-        >
-          🔒
-        </span>
-      )}
+
       {!locked && (
-        <span
-          role="img"
-          aria-label="Locked"
-          className={bemMenuItem("close-icon")}
-        >
-          ❌
-        </span>
+        <CloseIcon
+          className={bemIcon({ small: true }, [bemMenuItem("close-icon")])}
+        />
       )}
     </li>
   );

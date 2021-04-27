@@ -10,6 +10,7 @@ import bem from "../../../helpers/bem";
 import { DropdownTab, Section, TabKey } from "../types";
 import useWatchOutsideClick from "../DropdownTabMenu/hooks/useWatchOutsideClick";
 import getDropdownTabByKey from "../utils/getDropdownTabByKey";
+import { ReactComponent as DropdownIcon } from "../../../assets/arrow_drop_down_24dp.svg";
 
 const bemTab = bem("tab");
 const bemDropdownTab = bem("dropdown-tab");
@@ -188,9 +189,9 @@ function SelectedTabInfo({
       {locked && (
         <span className={bemDropdownTab("indicator", { lock: true })} />
       )}
-      <span className={bemDropdownTab("dropdown-icon", { open: isOpen })}>
-        🔻
-      </span>
+      <DropdownIcon
+        className={bemDropdownTab("dropdown-icon", { open: isOpen })}
+      />
     </div>
   );
 }

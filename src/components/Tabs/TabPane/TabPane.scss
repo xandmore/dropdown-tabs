@@ -1,16 +1,15 @@
 .tap-panes-container {
   overflow: hidden;
-}
 
-.tab-panes-container-inner {
-  display: flex;
-  width: 100%;
-  transition: transform 0.3s cubic-bezier(0.65, 0.05, 0.36, 1);
-  will-change: transform;
+  &__inner {
+    display: flex;
+    width: 100%;
+    transition: transform 0.3s cubic-bezier(0.65, 0.05, 0.36, 1);
+    will-change: transform;
+  }
 }
 
 .tab-pane {
-  box-sizing: border-box;
   padding: 20px;
   flex: 0 0 100%;
   will-change: opacity;

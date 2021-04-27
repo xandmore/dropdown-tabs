@@ -4,8 +4,7 @@ import useTabs from "../hooks/useTabs";
 import { TabKey } from "../types";
 import bem from "../../../helpers/bem";
 
-const bemContainer = bem("tab-panes-container");
-const bemContainerInner = bem("tab-panes-container-inner");
+const bemContainer = bem("tap-panes-container");
 
 export type TabPanesContainerProps = {
   className?: string;
@@ -46,10 +45,10 @@ function TabPanesContainer({
   return (
     <div className={bemContainer(null, [className])}>
       <div
-        className={bemContainerInner(null, [classNameInner])}
+        className={bemContainer("inner", null, [classNameInner])}
         style={{ transform: `translateX(-${shift}00%)` }}
       >
-        {flattenTabs.map((t, i) => (
+        {flattenTabs.map((t) => (
           <TabPane key={t.key} active={activeKey === t.key} tab={t} />
         ))}
       </div>
