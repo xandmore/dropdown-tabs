@@ -2,26 +2,21 @@ import React from "react";
 import bem from "../../../helpers/bem";
 import { DropdownTab, Section, TabKey } from "../types";
 const bemMenu = bem("dropdown-menu");
+const bemMenuItem = bem("dropdown-menu-item");
 
 export type DropdownMenuProps = {
   onChange: (key: TabKey) => void;
   sections: Section[];
-  width?: number;
   activeKey: TabKey | null;
 };
 
 export function DropdownMenu({
   onChange,
   sections,
-  width = 250,
   activeKey,
 }: DropdownMenuProps) {
   return (
-    <div
-      className={bemMenu()}
-      style={{ width: width }}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className={bemMenu()} onClick={(e) => e.stopPropagation()}>
       {sections.map((s, i) => {
         return (
           !!s.tabs?.length && (
@@ -51,8 +46,12 @@ function DropdownMenuSection({
   activeKey,
 }: DropdownMenuSectionProps) {
   return (
-    <div>
-      <span className={bemMenu("section-title")}>{title}</span>
+    <div className={bemMenu("section")}>
+      <div className={bemMenu("section-title")}>
+        <span className={bemMenu("section-title-text", ["text-truncate"])}>
+          {title}
+        </span>
+      </div>
       <ul className={bemMenu("section")}>
         {tabs?.map((tab) => (
           <DropdownMenuItem
@@ -67,7 +66,7 @@ function DropdownMenuSection({
 }
 
 export type DropdownMenuItemProps = {
-  active?: boolean;
+  active: boolean;
   disabled?: boolean;
   title: DropdownTab["title"];
   locked?: boolean;
@@ -85,7 +84,7 @@ function DropdownMenuItem({
 }: DropdownMenuItemProps) {
   return (
     <li
-      className={bemMenu("item", {
+      className={bemMenuItem({
         active: active,
         locked: locked,
         disabled: disabled,
@@ -93,23 +92,39 @@ function DropdownMenuItem({
       onClick={disabled ? undefined : onClick}
     >
       {starred && (
-        <span role="img" aria-label="Starred" className={bemMenu("star-icon")}>
+        <span
+          role="img"
+          aria-label="Starred"
+          className={bemMenuItem("star-icon")}
+        >
           ⭐
         </span>
       )}
       {locked && (
-        <span role="img" aria-label="Locked" className={bemMenu("lock-icon")}>
+        <span
+          role="img"
+          aria-label="Locked"
+          className={bemMenuItem("lock-icon")}
+        >
           🔒
         </span>
       )}
-      <span className={bemMenu("option-title")}>{title}</span>
+      <span className={bemMenuItem("title", ["text-truncate"])}>{title}</span>
       {locked && (
-        <span role="img" aria-label="Locked" className={bemMenu("lock-icon")}>
+        <span
+          role="img"
+          aria-label="Locked"
+          className={bemMenuItem("lock-icon")}
+        >
           🔒
         </span>
       )}
       {!locked && (
-        <span role="img" aria-label="Locked" className={bemMenu("close-icon")}>
+        <span
+          role="img"
+          aria-label="Locked"
+          className={bemMenuItem("close-icon")}
+        >
           ❌
         </span>
       )}

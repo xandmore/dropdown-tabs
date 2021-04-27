@@ -7,11 +7,12 @@ import React, {
 } from "react";
 import DropdownMenu from "../DropdownTabMenu/DropdownTabMenu";
 import bem from "../../../helpers/bem";
-import { Section, TabKey } from "../types";
+import { DropdownTab, Section, TabKey } from "../types";
 import useWatchOutsideClick from "../DropdownTabMenu/hooks/useWatchOutsideClick";
 import getDropdownTabByKey from "../utils/getDropdownTabByKey";
 
 const bemTab = bem("tab");
+const bemDropdownTab = bem("dropdown-tab");
 
 export type DropdownTabProps = {
   onChange: (key: TabKey) => void;
@@ -30,7 +31,7 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
       sections,
       activeKey,
       defaultKey,
-      placeholder = "Active Tabs",
+      placeholder = "ACTIVE TABS",
     },
     ref
   ) {
@@ -44,15 +45,25 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
     });
 
     useEffect(() => {
-      setActiveTabInfo((tab) => {
-        return (
-          getDropdownTabByKey(activeKey, sections) ??
-          getDropdownTabByKey(tab?.key, sections)
-        );
+      setActiveTabInfo((tabInfo) => {
+        let newInfo = getDropdownTabByKey(activeKey, sections);
+
+        if (!newInfo.tab) {
+          newInfo = getDropdownTabByKey(tabInfo.tab?.key, sections);
+        }
+
+        if (
+          newInfo.tab !== tabInfo.tab ||
+          newInfo.section !== tabInfo.section
+        ) {
+          return newInfo;
+        }
+
+        return tabInfo;
       });
     }, [sections, activeKey]);
 
-    const isActive = activeTabInfo?.key === activeKey;
+    const isActive = activeTabInfo.tab?.key === activeKey;
 
     const onClick = useCallback(() => {
       setIsOpen((open) => {
@@ -64,13 +75,13 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
           return !open;
         }
 
-        return !activeTabInfo;
+        return !activeTabInfo.tab;
       });
 
-      if (activeTabInfo) {
-        onChange(activeTabInfo.key);
+      if (activeTabInfo.tab) {
+        onChange(activeTabInfo.tab.key);
       }
-    }, [isActive, activeTabInfo, onChange]);
+    }, [isActive, activeTabInfo.tab, onChange]);
 
     useEffect(() => {
       if (!isActive) {
@@ -85,8 +96,6 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
       },
       [onChange]
     );
-
-    const title = activeTabInfo?.title ?? placeholder;
 
     const prevTabWidth = useRef<number | null>(null);
     const innerTabRef = useRef<HTMLDivElement>({} as HTMLDivElement);
@@ -105,6 +114,11 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
       }
     });
 
+    const title = activeTabInfo.tab?.title;
+    const sectionTitle = activeTabInfo.section?.title;
+    const starred = activeTabInfo.tab?.starred;
+    const locked = activeTabInfo.tab?.locked;
+
     return (
       <div
         ref={(el) => {
@@ -118,12 +132,21 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
 
           innerTabRef.current = el as HTMLDivElement;
         }}
-        className={bemTab({ active: isActive })}
+        className={bemTab({ active: isActive, dropdown: true })}
         style={{ position: "relative" }}
         onClick={onClick}
       >
-        <span>{title}</span>
-        <span style={{ marginLeft: 20 }}>🔻</span>
+        {activeTabInfo.tab && (
+          <SelectedTabInfo
+            isOpen={isOpen}
+            sectionTitle={sectionTitle}
+            title={title}
+            starred={starred}
+            locked={locked}
+          />
+        )}
+        {!activeTabInfo.tab && placeholder}
+
         {isOpen && (
           <DropdownMenu
             sections={sections}
@@ -135,5 +158,41 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
     );
   }
 );
+
+type SelectedTabInfoProps = {
+  isOpen: boolean;
+  sectionTitle: Section["title"];
+  title: DropdownTab["title"];
+  starred: DropdownTab["starred"];
+  locked: DropdownTab["locked"];
+};
+
+function SelectedTabInfo({
+  isOpen,
+  sectionTitle,
+  title,
+  starred,
+  locked,
+}: SelectedTabInfoProps) {
+  return (
+    <div className={bemDropdownTab()}>
+      <span className={bemDropdownTab("section-title", ["text-truncate"])}>
+        {sectionTitle}
+      </span>
+      <span className={bemDropdownTab("title", ["text-truncate"])}>
+        {title}
+      </span>
+      {starred && (
+        <span className={bemDropdownTab("indicator", { star: true })} />
+      )}
+      {locked && (
+        <span className={bemDropdownTab("indicator", { lock: true })} />
+      )}
+      <span className={bemDropdownTab("dropdown-icon", { open: isOpen })}>
+        🔻
+      </span>
+    </div>
+  );
+}
 
 export default DropdownTabComponent;

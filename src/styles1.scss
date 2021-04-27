@@ -1,10 +1,9 @@
 @import "node_modules/nord/src/sass/nord";
 @import "./components/Tabs/TabPane/TabPane.scss";
+@use "sass:color";
 
 $tabs-height: 40px;
-//$tabs-background-color: #2e3440;
 $tabs-background-color: #f6f7f9;
-//$tabs-font-color: #e5e9f0;
 $tabs-font-color: #002b5d;
 $tabs-slider-height: 3px;
 $tabs-outer-border-color: #91a1bb;
@@ -14,12 +13,25 @@ $tab-active-background-color: #fff;
 $tab-hover-background-color: #eee;
 
 $tab-color: #91a1bb;
-$tab-color-active: #002b5d;
+$tab-color-active: $tabs-font-color;
+$dropdown-menu-color: $tabs-font-color;
 
 $tab-slider-color: #21bed5;
+$orange: #ffa850;
+
+$border-color: #cacfd9;
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
 
 body {
-  background-color: #434c5e;
   font-family: "Open Sans", sans-serif;
 }
 
@@ -28,9 +40,9 @@ body {
   position: relative;
   height: $tabs-height;
   color: $tabs-font-color;
-  border: $tabs-outer-border-width solid $tabs-outer-border-color;
+  border: $tabs-outer-border-width solid $border-color;
+  border-left: none;
   background-color: $tabs-background-color;
-  box-sizing: border-box;
 
   &-slider {
     height: 3px;
@@ -38,7 +50,7 @@ body {
     background: $tab-slider-color;
     position: absolute;
     z-index: 1;
-    top: $tabs-height - $tabs-outer-border-width - $tabs-slider-height;
+    bottom: -$tabs-outer-border-width;
     user-select: none;
     will-change: left;
     left: 0;
@@ -56,6 +68,15 @@ body {
   user-select: none;
   color: $tab-color;
   transition: color 0.2s ease;
+  border-bottom: 2px solid $border-color;
+
+  &__title {
+    margin-top: 2px;
+  }
+
+  &:first-child {
+    border-left: 1px solid $border-color;
+  }
 
   &:hover {
     background-color: $tab-hover-background-color;
@@ -67,17 +88,133 @@ body {
   }
 
   &_dropdown {
-    position: relative;
+    width: 490px;
+    padding: 0 8px 0 16px;
   }
 }
 
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-tab {
+  $indicator-size: 12px;
+
+  width: 100%;
+  position: relative;
+  display: grid;
+  align-items: center;
+  grid-template:
+    "section section section icon" 15px
+    "star lock title icon" 1fr / 12px 12px 1fr 36px;
+
+  &__section-title {
+    font-weight: 400;
+    grid-area: section;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    grid-area: title;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  &__indicator {
+    width: $indicator-size / 2;
+    height: $indicator-size / 2;
+    border-radius: 50%;
+    justify-self: center;
+
+    &_lock {
+      grid-area: lock;
+      background: $tab-slider-color;
+    }
+
+    &_star {
+      grid-area: star;
+      background: $orange;
+    }
+  }
+
+  &__dropdown-icon {
+    grid-area: icon;
+    transition: 0.2s ease;
+    transform-origin: center;
+    justify-self: center;
+
+    &_open {
+      transform: rotate(60deg);
+    }
+  }
+}
+
+@mixin padding-and-width {
+  height: 40px;
+  padding: 0 16px;
+}
+
 .dropdown-menu {
+  color: $dropdown-menu-color;
   cursor: auto;
   z-index: 10;
   position: absolute;
   top: $tabs-height;
   left: 0;
-  background: $nord4;
-  padding: 10px;
-  color: #212121;
+  background: #fff;
+  box-shadow: 0 3px 6px rgba(#000, 0.16);
+  width: 100%;
+
+  &__section {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__section-title {
+    @include padding-and-width;
+
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+
+  &__section-title-text {
+    vertical-align: center;
+  }
+}
+
+.dropdown-menu-item {
+  @include padding-and-width;
+
+  display: grid;
+  grid-template-areas: "star lock title close";
+  grid-template-columns: 16px 16px 1fr 24px;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 400;
+
+  &_active {
+    font-weight: 600;
+  }
+
+  &__title {
+    grid-area: title;
+  }
+
+  &__star-icon {
+    grid-area: star;
+  }
+
+  &__lock-icon {
+    grid-area: lock;
+  }
+
+  &__close-icon {
+    grid-area: close;
+    justify-self: end;
+  }
 }

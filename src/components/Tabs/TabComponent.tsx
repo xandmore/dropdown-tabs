@@ -19,7 +19,7 @@ const TabComponent = React.forwardRef<HTMLDivElement, TabProps>(
         role="tab"
         {...rest}
       >
-        {title}
+        <span className={bemTab("title")}>{title}</span>
       </div>
     );
   }
