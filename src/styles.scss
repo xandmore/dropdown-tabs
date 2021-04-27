@@ -1,0 +1,249 @@
+@import "./components/Tabs/TabPane/TabPane.scss";
+@use "sass:color";
+
+// base colors
+$color-turquoise: #21bed5;
+$color-orange: #ffa850;
+$color-dark-blue: #002b5d;
+$color-grey-1: #91a1bb;
+$color-grey-2: #f6f7f9;
+$color-grey-3: #cacfd9;
+
+$font-color: $color-dark-blue;
+$border-color: $color-grey-3;
+
+$color-inactive: $color-grey-1;
+
+// icons
+$icon-size-normal: 24px;
+$icon-size-small: 18px;
+
+// tabs
+$tabs-height: 40px;
+$tabs-background-color: $color-grey-2;
+$tabs-font-color: $color-inactive;
+$tabs-outer-border-color: $color-grey-1;
+$tabs-outer-border-width: 1px;
+
+$tabs-slider-height: 3px;
+$tabs-slider-color: $color-turquoise;
+
+$tab-active-background-color: #fff;
+$tab-hover-background-color: #eee; // unknown
+
+$tab-color-active: $font-color;
+$dropdown-menu-color: $font-color;
+$dropdown-menu-item-height: 40px;
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+}
+
+.tabs {
+  display: flex;
+  position: relative;
+  height: $tabs-height;
+  color: $tabs-font-color;
+  border: $tabs-outer-border-width solid $border-color;
+  border-left: none;
+  background-color: $tabs-background-color;
+
+  &-slider {
+    height: 3px;
+    width: 50px;
+    background: $tabs-slider-color;
+    position: absolute;
+    z-index: 1;
+    bottom: -$tabs-outer-border-width;
+    user-select: none;
+    will-change: left;
+    left: 0;
+    transition: left 0.3s ease;
+  }
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  transition: color 0.2s ease;
+  border-bottom: 2px solid $border-color;
+
+  &__title {
+    margin-top: 2px;
+  }
+
+  &:first-child {
+    border-left: 1px solid $border-color;
+  }
+
+  &:hover {
+    background-color: $tab-hover-background-color;
+  }
+
+  &_active {
+    color: $tab-color-active;
+    background-color: $tab-active-background-color;
+  }
+
+  &_dropdown {
+    width: 490px;
+    padding: 0 8px 0 16px;
+  }
+}
+
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-tab {
+  $indicator-size: 12px;
+
+  width: 100%;
+  position: relative;
+  display: grid;
+  align-items: center;
+  grid-template:
+    "section section section icon" 15px
+    "star lock title icon" 1fr / 12px 12px 1fr 36px;
+
+  &__section-title {
+    font-weight: 400;
+    grid-area: section;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    grid-area: title;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  &__indicator {
+    width: $indicator-size / 2;
+    height: $indicator-size / 2;
+    border-radius: 50%;
+    justify-self: center;
+
+    &_lock {
+      grid-area: lock;
+      background: $tabs-slider-color;
+    }
+
+    &_star {
+      grid-area: star;
+      background: $color-orange;
+    }
+  }
+
+  &__dropdown-icon {
+    grid-area: icon;
+    color: $color-grey-1;
+    transition: 0.2s ease;
+    justify-self: center;
+
+    &_open {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+@mixin padding-and-width {
+  height: $dropdown-menu-item-height;
+  padding: 0 16px;
+}
+
+.dropdown-menu {
+  color: $dropdown-menu-color;
+  cursor: auto;
+  z-index: 10;
+  position: absolute;
+  top: $tabs-height;
+  left: 0;
+  background: #fff;
+  box-shadow: 0 3px 6px rgba(#000, 0.16);
+  width: 100%;
+  max-height: $dropdown-menu-item-height * 7;
+  overflow-y: auto;
+
+  &__section {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__section-title {
+    @include padding-and-width;
+
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.dropdown-menu-item {
+  @include padding-and-width;
+
+  display: grid;
+  grid-template-areas: "star lock title close";
+  grid-template-columns: $icon-size-small $icon-size-small 1fr $icon-size-normal;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 400;
+
+  &_active {
+    font-weight: 600;
+  }
+
+  &__title {
+    grid-area: title;
+    margin-left: 4px;
+  }
+
+  &__star-icon {
+    grid-area: star;
+    color: $color-orange;
+  }
+
+  &__lock-icon {
+    grid-area: lock;
+    color: $color-turquoise;
+  }
+
+  &__close-icon {
+    grid-area: close;
+    justify-self: end;
+    color: $color-inactive;
+
+    &:hover {
+      color: lighten($color-inactive, 8%);
+    }
+  }
+}
+
+.icon {
+  width: $icon-size-normal;
+  height: $icon-size-normal;
+
+  &_small {
+    width: $icon-size-small;
+    height: $icon-size-small;
+  }
+}
