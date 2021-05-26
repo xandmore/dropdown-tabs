@@ -1,10 +1,15 @@
 import getDropdownTabByKey from "../../utils/getDropdownTabByKey";
-import { Section, Tab, TabKey } from "../../types";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { Section, Tab, TabKey, TabsRef } from "../../types";
+import {
+  useCallback,
+  useLayoutEffect,
+  useState,
+  MutableRefObject,
+} from "react";
 
 export type SliderRenderingInfo = {
-  tabsElements: Record<Tab["key"], HTMLDivElement | null>;
-  dropdownTabElement: HTMLDivElement | null;
+  tabsElements: Record<Tab["key"], HTMLButtonElement | null>;
+  dropdownTabElement: HTMLButtonElement | null;
 };
 
 export type SlideDisplayInfo = {
@@ -19,12 +24,11 @@ const defaultDiplayInfo: SlideDisplayInfo = {
   left: 0,
 };
 
-function useSlider(activeTabKey: TabKey | null, sections: Section[]) {
-  const elementsRef = useRef<SliderRenderingInfo>({
-    tabsElements: {},
-    dropdownTabElement: null,
-  });
-
+function useSlider(
+  activeTabKey: TabKey | null,
+  sections: Section[],
+  tabsRef: MutableRefObject<TabsRef>
+) {
   const [displayInfo, setDisplayInfo] = useState<SlideDisplayInfo>({
     isDisplayed: false,
     width: 0,
@@ -40,19 +44,22 @@ function useSlider(activeTabKey: TabKey | null, sections: Section[]) {
       return;
     }
 
-    let tabElement = elementsRef.current.tabsElements[activeTabKey];
+    let targetElement: HTMLElement | null =
+      Object.values(tabsRef.current.tabs).find(
+        (t) => t.tab.key === activeTabKey
+      )?.element ?? null;
 
-    if (!tabElement) {
+    if (!targetElement) {
       const isDropdownTab = !!getDropdownTabByKey(activeTabKey, sections)?.tab;
-      tabElement = isDropdownTab
-        ? elementsRef.current.dropdownTabElement
+      targetElement = isDropdownTab
+        ? (tabsRef.current.dropdownTab.element?.parentNode as HTMLElement)
         : null;
     }
 
     const newDisplayInfo: SlideDisplayInfo = {
-      isDisplayed: !!tabElement,
-      width: tabElement?.getBoundingClientRect().width ?? 0,
-      left: tabElement?.offsetLeft ?? 0,
+      isDisplayed: !!targetElement,
+      width: targetElement?.getBoundingClientRect().width ?? 0,
+      left: targetElement?.offsetLeft ?? 0,
     };
 
     setDisplayInfo((d) => (isEqual(d, newDisplayInfo) ? d : newDisplayInfo));
@@ -60,18 +67,16 @@ function useSlider(activeTabKey: TabKey | null, sections: Section[]) {
 
   const onDropdownTabWidthChange = useCallback(() => {
     setDisplayInfo((prev) => {
+      const node = tabsRef.current.dropdownTab.element;
       return {
         ...prev,
-        width:
-          elementsRef.current.dropdownTabElement?.getBoundingClientRect()
-            .width ?? 0,
-        left: elementsRef.current.dropdownTabElement?.offsetLeft ?? 0,
+        width: node?.getBoundingClientRect().width ?? 0,
+        left: node?.offsetLeft ?? 0,
       };
     });
-  }, []);
+  }, [tabsRef]);
 
   return {
-    elementsRef,
     sliderDisplayInfo: displayInfo,
     onDropdownTabWidthChange: onDropdownTabWidthChange,
   };

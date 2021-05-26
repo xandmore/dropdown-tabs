@@ -16,4 +16,29 @@ export interface Section {
   tabs: DropdownTab[];
 }
 
+export type TabsRef = {
+  container: HTMLDivElement | null;
+
+  tabs: Record<
+    number,
+    {
+      element: HTMLButtonElement | null;
+      tab: Tab;
+    }
+  >;
+
+  dropdownTab: {
+    element: HTMLButtonElement | null;
+    id: Symbol;
+  };
+
+  dropdownItems: Record<
+    number,
+    {
+      element: HTMLButtonElement | null;
+      tab: Tab;
+    }
+  >;
+};
+
 export type TabKey = Tab["key"];

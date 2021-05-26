@@ -11,68 +11,107 @@ import { DropdownTab, Section, TabKey } from "../types";
 import useWatchOutsideClick from "../DropdownTabMenu/hooks/useWatchOutsideClick";
 import getDropdownTabByKey from "../utils/getDropdownTabByKey";
 import { ReactComponent as DropdownIcon } from "../../../assets/arrow_drop_down_24dp.svg";
+import Ripple from "../Ripple/Ripple";
+import useRipple from "../Tabs/hooks/useRipple";
+import useMergeHandlers from "../Tabs/hooks/useMergeHandlers";
 
-const bemTab = bem("tab");
+const bemTabContainer = bem("dropdown-tab-container");
 const bemDropdownTab = bem("dropdown-tab");
+const bemTab = bem("tab");
 
-export type DropdownTabProps = {
+export type DropdownTabProps = Omit<
+  React.ComponentPropsWithRef<"button">,
+  "onChange"
+> & {
   onChange: (key: TabKey) => void;
   sections: Section[];
   activeKey: TabKey | null;
   defaultKey?: TabKey;
   placeholder?: React.ReactNode;
   onWidthChange: (width: number) => void;
+  isMenuOpen: boolean;
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
-  function DropdownTabComponent(
-    {
-      onWidthChange,
-      onChange,
-      sections,
-      activeKey,
-      defaultKey,
-      placeholder = "ACTIVE TABS",
-    },
-    ref
-  ) {
-    const [isOpen, setIsOpen] = useState(false);
+const DropdownTabComponent = React.forwardRef<
+  HTMLButtonElement,
+  DropdownTabProps
+>(function DropdownTabComponent(
+  {
+    isMenuOpen,
+    setIsMenuOpen,
+    onWidthChange,
+    onChange,
+    sections,
+    activeKey,
+    defaultKey,
+    placeholder = "ACTIVE TABS",
+    ...props
+  },
+  ref
+) {
+  const [activeTabInfo, setActiveTabInfo] = useState(() => {
+    return getDropdownTabByKey(
+      activeKey !== null ? activeKey : defaultKey,
+      sections
+    );
+  });
 
-    const [activeTabInfo, setActiveTabInfo] = useState(() => {
-      return getDropdownTabByKey(
-        activeKey !== null ? activeKey : defaultKey,
-        sections
-      );
+  useEffect(() => {
+    setActiveTabInfo((tabInfo) => {
+      let newInfo = getDropdownTabByKey(activeKey, sections);
+
+      if (!newInfo.tab) {
+        newInfo = getDropdownTabByKey(tabInfo.tab?.key, sections);
+      }
+
+      if (newInfo.tab !== tabInfo.tab || newInfo.section !== tabInfo.section) {
+        return newInfo;
+      }
+
+      return tabInfo;
     });
+  }, [sections, activeKey]);
 
-    useEffect(() => {
-      setActiveTabInfo((tabInfo) => {
-        let newInfo = getDropdownTabByKey(activeKey, sections);
+  const isMenuItemActive = activeTabInfo.tab?.key === activeKey;
 
-        if (!newInfo.tab) {
-          newInfo = getDropdownTabByKey(tabInfo.tab?.key, sections);
-        }
+  useEffect(() => {
+    if (!isMenuItemActive) {
+      setIsMenuOpen(false);
+    }
+  }, [isMenuItemActive, setIsMenuOpen]);
 
-        if (
-          newInfo.tab !== tabInfo.tab ||
-          newInfo.section !== tabInfo.section
-        ) {
-          return newInfo;
-        }
+  const prevTabWidth = useRef<number | null>(null);
+  const innerTabRef = useRef<HTMLButtonElement>(null!);
 
-        return tabInfo;
-      });
-    }, [sections, activeKey]);
+  const closeOutsideClick = useCallback(() => {
+    setIsMenuOpen(false);
+  }, [setIsMenuOpen]);
 
-    const isActive = activeTabInfo.tab?.key === activeKey;
+  useWatchOutsideClick(innerTabRef, closeOutsideClick);
 
-    const onClick = useCallback(() => {
-      setIsOpen((open) => {
+  useLayoutEffect(() => {
+    const width = innerTabRef.current.clientWidth ?? 0;
+    if (prevTabWidth.current !== width) {
+      prevTabWidth.current = width;
+      onWidthChange?.(width);
+    }
+  });
+
+  const title = activeTabInfo.tab?.title;
+  const sectionTitle = activeTabInfo.section?.title;
+  const starred = activeTabInfo.tab?.starred;
+  const locked = activeTabInfo.tab?.locked;
+
+  const onClickProp = props.onClick;
+  const onClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setIsMenuOpen((open) => {
         if (open) {
           return false;
         }
 
-        if (isActive) {
+        if (isMenuItemActive) {
           return !open;
         }
 
@@ -82,46 +121,23 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
       if (activeTabInfo.tab) {
         onChange(activeTabInfo.tab.key);
       }
-    }, [isActive, activeTabInfo.tab, onChange]);
 
-    useEffect(() => {
-      if (!isActive) {
-        setIsOpen(false);
-      }
-    }, [isActive]);
+      onClickProp?.(e);
+    },
+    [setIsMenuOpen, activeTabInfo.tab, isMenuItemActive, onChange, onClickProp]
+  );
 
-    const onSelectTab = useCallback(
-      (tabKey: TabKey) => {
-        onChange?.(tabKey);
-        setIsOpen(false);
-      },
-      [onChange]
-    );
+  const {
+    isRippleDisplayed,
+    rippleRelatedHandlers,
+    pressingInfo,
+  } = useRipple();
 
-    const prevTabWidth = useRef<number | null>(null);
-    const innerTabRef = useRef<HTMLDivElement>({} as HTMLDivElement);
-
-    const closeOutsideClick = useCallback(() => {
-      setIsOpen(false);
-    }, []);
-
-    useWatchOutsideClick(innerTabRef, closeOutsideClick);
-
-    useLayoutEffect(() => {
-      const width = innerTabRef.current.clientWidth ?? 0;
-      if (prevTabWidth.current !== width) {
-        prevTabWidth.current = width;
-        onWidthChange?.(width);
-      }
-    });
-
-    const title = activeTabInfo.tab?.title;
-    const sectionTitle = activeTabInfo.section?.title;
-    const starred = activeTabInfo.tab?.starred;
-    const locked = activeTabInfo.tab?.locked;
-
-    return (
-      <div
+  return (
+    <div className={bemTabContainer()}>
+      <button
+        tabIndex={isMenuItemActive ? 0 : -1}
+        className={bemTab({ active: isMenuItemActive, dropdown: true })}
         ref={(el) => {
           if (ref) {
             if (typeof ref === "function") {
@@ -131,34 +147,61 @@ const DropdownTabComponent = React.forwardRef<HTMLDivElement, DropdownTabProps>(
             }
           }
 
-          innerTabRef.current = el as HTMLDivElement;
+          innerTabRef.current = el as HTMLButtonElement;
         }}
-        className={bemTab({ active: isActive, dropdown: true })}
-        style={{ position: "relative" }}
+        aria-haspopup={true}
+        {...props}
+        onTouchStart={useMergeHandlers(
+          rippleRelatedHandlers.onTouchStart,
+          props.onTouchStart
+        )}
+        onTouchEnd={useMergeHandlers(
+          rippleRelatedHandlers.onTouchEnd,
+          props.onTouchEnd
+        )}
+        onMouseDown={useMergeHandlers(
+          rippleRelatedHandlers.onMouseDown,
+          props.onMouseDown
+        )}
+        onMouseUp={useMergeHandlers(
+          rippleRelatedHandlers.onMouseUp,
+          props.onMouseUp
+        )}
+        onKeyDown={useMergeHandlers(
+          rippleRelatedHandlers.onKeyDown,
+          props.onKeyDown
+        )}
+        onKeyUp={useMergeHandlers(rippleRelatedHandlers.onKeyUp, props.onKeyUp)}
+        onFocus={useMergeHandlers(rippleRelatedHandlers.onFocus, props.onFocus)}
+        onBlur={useMergeHandlers(rippleRelatedHandlers.onBlur, props.onBlur)}
         onClick={onClick}
       >
+        <Ripple
+          visible={isRippleDisplayed}
+          point={pressingInfo.point}
+          mode={pressingInfo.pressing ? "pressing" : "focused"}
+        />
+
         {activeTabInfo.tab && (
           <SelectedTabInfo
-            isOpen={isOpen}
+            isOpen={isMenuOpen}
             sectionTitle={sectionTitle}
             title={title}
             starred={starred}
             locked={locked}
           />
         )}
-        {!activeTabInfo.tab && placeholder}
 
-        {isOpen && (
-          <DropdownMenu
-            sections={sections}
-            onChange={onSelectTab}
-            activeKey={activeKey}
-          />
-        )}
-      </div>
-    );
-  }
-);
+        {!activeTabInfo.tab && placeholder}
+      </button>
+      <DropdownMenu
+        open={isMenuOpen}
+        sections={sections}
+        activeKey={activeKey}
+      />
+    </div>
+  );
+});
 
 type SelectedTabInfoProps = {
   isOpen: boolean;

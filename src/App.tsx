@@ -24,11 +24,11 @@ export default function App() {
       tabs: [
         {
           key: "dropdownTab0",
-          title: "Dropdown Tab 0",
+          title: "Tab 0",
         },
         {
           key: "dropdownTab1",
-          title: "Menu item 1",
+          title: "Tab 2",
           locked: true,
           starred: true,
         },
@@ -36,16 +36,16 @@ export default function App() {
     },
     {
       key: "s1",
-      title: new Array(10).fill("Long Section Title").join(" "),
+      title: new Array(4).fill("Long Section Title").join(" "),
       tabs: [
         {
           key: "dropdownTab2",
-          title: new Array(10).fill("Dropdown menu item 2").join(" "),
+          title: new Array(3).fill("Dropdown menu item 2").join(" "),
           starred: true,
         },
         {
           key: "dropdownTab3",
-          title: "Dropdown tab 3",
+          title: "Tab 3",
           locked: true,
         },
       ],
@@ -121,8 +121,8 @@ function Buttons() {
   };
 
   return (
-    <div>
-      <h2>Change dropdown tab</h2>
+    <div style={{ borderTop: "1px solid", marginTop: 24, padding: 8 }}>
+      <p>Dropdown tab actions</p>
 
       <button disabled={!isDropdownTab} onClick={onToggleStar}>
         Toggle Star
