@@ -65,13 +65,11 @@ function TabsComponent({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const {
-    focusedTabId,
-    onDropdownTabFocus,
-    onTabFocus,
-    onTabBlur,
-    onItemFocus,
-  } = useKeyDownHandler({ tabsRef, isMenuOpen, setIsMenuOpen });
+  const { focusedTabId, handlers } = useKeyDownHandler({
+    tabsRef,
+    isMenuOpen,
+    setIsMenuOpen,
+  });
 
   return (
     <div
@@ -99,13 +97,13 @@ function TabsComponent({
           title={tab.title}
           active={activeTabKey === tab.key}
           onClick={() => onChange(tab.key)}
-          onBlur={onTabBlur}
-          onFocus={() => onTabFocus(tab.key)}
+          onBlur={handlers.onTabBlur}
+          onFocus={() => handlers.onTabFocus(tab)}
         />
       ))}
 
       <DropdownTabContextProvider
-        menuItemRef={(el, tab, index) => {
+        menuItemRef={useCallback((el, tab, index) => {
           if (!el) {
             delete tabsRef.current.dropdownItems[index];
             return;
@@ -115,10 +113,8 @@ function TabsComponent({
             tab: tab,
             element: el,
           };
-        }}
-        onMenuItemFocus={(tab, e) => {
-          onItemFocus(tab.key, e);
-        }}
+        }, [])}
+        onMenuItemFocus={handlers.onItemFocus}
         focusedTabId={focusedTabId}
         onCloseMenuItem={onDropdownTabClose}
         onActivateMenuItem={useCallback(
@@ -139,7 +135,7 @@ function TabsComponent({
               };
             }}
             onFocus={(e) => {
-              onDropdownTabFocus(DROPDOWN_TAB_KEY, e);
+              handlers.onDropdownTabFocus(DROPDOWN_TAB_KEY, e);
             }}
             activeKey={activeTabKey}
             onChange={onChange}

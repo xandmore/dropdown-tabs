@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useRef } from "react";
 import TabPane from "./TabPane";
-import useTabs from "../hooks/useTabs";
+import useTabsContext from "../hooks/useTabsContext";
 import { TabKey } from "../types";
 import bem from "../../../helpers/bem";
 
@@ -15,7 +15,7 @@ function TabPanesContainer({
   className,
   classNameInner,
 }: TabPanesContainerProps) {
-  const { tabs, sections, activeKey } = useTabs();
+  const { tabs, sections, activeKey } = useTabsContext();
 
   const flattenTabs = useMemo(() => {
     let flatten = tabs ? [...tabs] : [];

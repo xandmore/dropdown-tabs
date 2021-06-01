@@ -4,7 +4,6 @@ import { DropdownTab, Section, Tab, TabKey } from "../types";
 import { ReactComponent as CloseIcon } from "../../../assets/close_24dp.svg";
 import { ReactComponent as LockIcon } from "../../../assets/lock_24dp.svg";
 import { ReactComponent as StarIcon } from "../../../assets/star_outline_24dp.svg";
-import useTabs from "../hooks/useTabs";
 import useDropdownTabContext from "../DropdownTab/DropdownTabContext/useDropdownTabContext";
 import useRipple from "../Tabs/hooks/useRipple";
 import Ripple from "../Ripple/Ripple";
@@ -123,11 +122,11 @@ function DropdownMenuItem({
   disabled,
   menuItemRef,
 }: DropdownMenuItemProps) {
-  const { closeDropdownTab } = useTabs();
   const {
     onActivateMenuItem,
     onMenuItemFocus,
     focusedTabId,
+    onCloseMenuItem,
   } = useDropdownTabContext();
 
   const { locked, starred, title } = tab;
@@ -200,7 +199,7 @@ function DropdownMenuItem({
             onFocus={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              closeDropdownTab(tab.key);
+              onCloseMenuItem(tab.key);
             }}
           >
             <CloseIcon className={bemIcon({ small: true })} />

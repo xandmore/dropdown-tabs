@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { TabsContext } from "../TabsContext/TabsContext";
 
-function useTabs() {
+function useTabsContext() {
   return useContext(TabsContext);
 }
 
-export default useTabs;
+export default useTabsContext;

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { TabKey, TabsRef } from "../../types";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
+import { Tab, TabKey, TabsRef } from "../../types";
 
 enum KeyCode {
   ArrowLeft = "ArrowLeft",
@@ -10,6 +10,13 @@ enum KeyCode {
   Home = "Home",
   End = "End",
 }
+
+type Handlers = {
+  onTabFocus: (tab: Tab, e?: React.FocusEvent) => void;
+  onTabBlur: (e?: React.FocusEvent) => void;
+  onDropdownTabFocus: (id: Symbol, e?: React.FocusEvent) => void;
+  onItemFocus: (tab: Tab, e: React.FocusEvent) => void;
+};
 
 function nextOrFirst(currentIndex: number, max: number) {
   return currentIndex === max ? 0 : currentIndex + 1;
@@ -32,24 +39,20 @@ function useKeyDownHandler({
     null
   );
 
-  const onTabFocus = (id: TabKey, e?: React.FocusEvent) => {
-    setFocusedTabId(id);
-  };
-
-  const onDropdownTabFocus = (
-    id: Symbol,
-    e: React.FocusEvent<HTMLButtonElement>
-  ) => {
-    setFocusedTabId(id);
-  };
-
-  const onItemFocus = (id: TabKey, e: React.FocusEvent) => {
-    e.stopPropagation();
-    setFocusedTabId(id);
-  };
-
-  const onTabBlur = () => {
-    setFocusedTabId(null);
+  const handlers: Handlers = {
+    onTabFocus: (tab) => {
+      setFocusedTabId(tab.key);
+    },
+    onTabBlur: () => {
+      setFocusedTabId(null);
+    },
+    onDropdownTabFocus: (id) => {
+      setFocusedTabId(id);
+    },
+    onItemFocus: (tab, e) => {
+      e?.stopPropagation();
+      setFocusedTabId(tab.key);
+    },
   };
 
   useEffect(() => {
@@ -124,10 +127,7 @@ function useKeyDownHandler({
 
   return {
     focusedTabId,
-    onTabFocus,
-    onDropdownTabFocus,
-    onItemFocus,
-    onTabBlur,
+    handlers,
   };
 }
 
