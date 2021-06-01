@@ -5,7 +5,10 @@ export type DropdownTabContextValue = {
   menuItemRef: (el: HTMLButtonElement | null, tab: Tab, index: number) => void;
   onMenuItemFocus: (tab: Tab, e: FocusEvent<HTMLButtonElement>) => void;
   focusedTabId: TabKey | null | Symbol;
-  onActivateMenuItem: (key: Required<TabKey>) => void;
+  onActivateMenuItem: (
+    key: Required<TabKey>,
+    isInitiatedByKeyboard?: boolean
+  ) => void;
   onCloseMenuItem: (key: Required<TabKey>) => void;
 };
 

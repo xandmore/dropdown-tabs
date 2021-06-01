@@ -14,6 +14,9 @@ import { ReactComponent as DropdownIcon } from "../../../assets/arrow_drop_down_
 import Ripple from "../Ripple/Ripple";
 import useRipple from "../Tabs/hooks/useRipple";
 import useMergeHandlers from "../Tabs/hooks/useMergeHandlers";
+import useDropdownTabContext from "./DropdownTabContext/useDropdownTabContext";
+import { DropdownTabContextValue } from "./DropdownTabContext/DropdownTabContext";
+import { DropdownTabContextProvider } from "./DropdownTabContext/DropdownTabContextProvider";
 
 const bemTabContainer = bem("dropdown-tab-container");
 const bemDropdownTab = bem("dropdown-tab");
@@ -131,7 +134,31 @@ const DropdownTabComponent = React.forwardRef<
     isRippleDisplayed,
     rippleRelatedHandlers,
     pressingInfo,
+    setFocusInfo,
   } = useRipple();
+
+  const { onActivateMenuItem, ...restContextValues } = useDropdownTabContext();
+  const onActivateMenuItemWrapped = useCallback<
+    DropdownTabContextValue["onActivateMenuItem"]
+  >(
+    (tabKey, isInitiatedByKeyboard) => {
+      onActivateMenuItem(tabKey, isInitiatedByKeyboard);
+
+      // if menu item is activated via click then hide ripple
+      if (!isInitiatedByKeyboard) {
+        setFocusInfo((fi) => ({
+          ...fi,
+          focused: false,
+        }));
+      }
+    },
+    [onActivateMenuItem, setFocusInfo]
+  );
+
+  const contextValueOverridden: DropdownTabContextValue = {
+    ...restContextValues,
+    onActivateMenuItem: onActivateMenuItemWrapped,
+  };
 
   return (
     <div className={bemTabContainer()}>
@@ -194,11 +221,13 @@ const DropdownTabComponent = React.forwardRef<
 
         {!activeTabInfo.tab && placeholder}
       </button>
-      <DropdownMenu
-        open={isMenuOpen}
-        sections={sections}
-        activeKey={activeKey}
-      />
+      <DropdownTabContextProvider {...contextValueOverridden}>
+        <DropdownMenu
+          open={isMenuOpen}
+          sections={sections}
+          activeKey={activeKey}
+        />
+      </DropdownTabContextProvider>
     </div>
   );
 });

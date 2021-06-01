@@ -165,7 +165,7 @@ function DropdownMenuItem({
         tabIndex={tabIndex}
         disabled={disabled}
         onClick={(e) => {
-          onActivateMenuItem(tab.key);
+          onActivateMenuItem(tab.key, e.detail === 0);
         }}
         {...rippleRelatedHandlers}
         onFocus={onFocus}

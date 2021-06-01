@@ -119,7 +119,7 @@ function TabsComponent({
         onCloseMenuItem={onDropdownTabClose}
         onActivateMenuItem={useCallback(
           (tabKey) => {
-            tabsRef.current.container?.focus();
+            tabsRef.current.dropdownTab.element?.focus();
             setIsMenuOpen(false);
             onChange(tabKey);
           },
