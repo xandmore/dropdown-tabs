@@ -1,9 +1,14 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import TabComponent from "./TabComponent";
 import DropdownTabComponent from "../DropdownTab/DropdownTabComponent";
-import { Section, Tab, TabKey } from "../types";
+import { Section, Tab, TabKey, TabsRef } from "../types";
 import Slider from "../Slider/Slider";
 import useSlider from "./hooks/useSlider";
+import useKeyboardNavigation from "./hooks/useKeyboardNavigation";
+import { DropdownTabContextProvider } from "../DropdownTab/DropdownTabContext/DropdownTabContextProvider";
+import generateTabId from "../utils/generateTabId";
+
+const DROPDOWN_TAB_KEY = Symbol();
 
 export type TabsProps = {
   tabs: Tab[];
@@ -27,8 +32,8 @@ function TabsComponent({
   );
 
   const onChange = useCallback(
-    (key) => {
-      if (onChangeProp && key !== Symbol.for("dropdownTab")) {
+    (key: TabKey | null) => {
+      if (onChangeProp) {
         onChangeProp(key);
       }
 
@@ -45,36 +50,103 @@ function TabsComponent({
     [sections]
   );
 
-  const {
-    elementsRef,
-    sliderDisplayInfo,
-    onDropdownTabWidthChange,
-  } = useSlider(activeTabKey, sections);
+  const tabsRef = useRef<TabsRef>({
+    tabs: {},
+    container: null,
+    dropdownTab: {},
+    dropdownItems: {},
+  } as TabsRef);
+
+  const { sliderDisplayInfo, onDropdownTabWidthChange } = useSlider(
+    activeTabKey,
+    sections,
+    tabsRef
+  );
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { focusedTabId, handlers } = useKeyboardNavigation({
+    tabsRef,
+    isMenuOpen,
+    setIsMenuOpen,
+  });
 
   return (
-    <div className="tabs">
-      {tabs.map((t) => (
+    <div
+      className="tabs"
+      role="tablist"
+      ref={(el) => {
+        tabsRef.current.container = el;
+      }}
+    >
+      {tabs.map((tab, index) => (
         <TabComponent
-          key={t.key}
-          title={t.title}
+          key={tab.key}
+          id={generateTabId(tab)}
           ref={(el) => {
-            elementsRef.current.tabsElements[t.key] = el;
+            if (!el) {
+              delete tabsRef.current.tabs[index];
+              return;
+            }
+
+            tabsRef.current.tabs[index] = {
+              element: el,
+              tab: tab,
+            };
           }}
-          onClick={() => onChange(t.key)}
-          active={activeTabKey === t.key}
+          title={tab.title}
+          active={activeTabKey === tab.key}
+          onClick={() => onChange(tab.key)}
+          onBlur={handlers.onTabBlur}
+          onFocus={() => handlers.onTabFocus(tab)}
         />
       ))}
 
-      {isDropdownTabDisplayed && (
-        <DropdownTabComponent
-          ref={(el) => (elementsRef.current.dropdownTabElement = el)}
-          activeKey={activeTabKey}
-          onChange={onChange}
-          sections={sections}
-          defaultKey={defaultActiveKey}
-          onWidthChange={onDropdownTabWidthChange}
-        />
-      )}
+      <DropdownTabContextProvider
+        menuItemRef={useCallback((el, tab, index) => {
+          if (!el) {
+            delete tabsRef.current.dropdownItems[index];
+            return;
+          }
+
+          tabsRef.current.dropdownItems[index] = {
+            tab: tab,
+            element: el,
+          };
+        }, [])}
+        onMenuItemFocus={handlers.onItemFocus}
+        focusedTabId={focusedTabId}
+        onCloseMenuItem={onDropdownTabClose}
+        onActivateMenuItem={useCallback(
+          (tabKey) => {
+            tabsRef.current.dropdownTab.element?.focus();
+            setIsMenuOpen(false);
+            onChange(tabKey);
+          },
+          [onChange]
+        )}
+      >
+        {isDropdownTabDisplayed && (
+          <DropdownTabComponent
+            ref={(el) => {
+              tabsRef.current.dropdownTab = {
+                id: DROPDOWN_TAB_KEY,
+                element: el,
+              };
+            }}
+            onFocus={(e) => {
+              handlers.onDropdownTabFocus(DROPDOWN_TAB_KEY, e);
+            }}
+            activeKey={activeTabKey}
+            onChange={onChange}
+            sections={sections}
+            defaultKey={defaultActiveKey}
+            onWidthChange={onDropdownTabWidthChange}
+            isMenuOpen={isMenuOpen}
+            setIsMenuOpen={setIsMenuOpen}
+          />
+        )}
+      </DropdownTabContextProvider>
 
       {sliderDisplayInfo.isDisplayed && (
         <Slider left={sliderDisplayInfo.left} width={sliderDisplayInfo.width} />
@@ -82,4 +154,5 @@ function TabsComponent({
     </div>
   );
 }
+
 export default TabsComponent;

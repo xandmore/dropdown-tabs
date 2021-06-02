@@ -1,16 +1,22 @@
 import React from "react";
-import useTabs from "../components/Tabs/hooks/useTabs";
+import useTabsContext from "./Tabs/hooks/useTabsContext";
 import Tabs from "./Tabs/Tabs/Tabs";
 
 function TabsWithContext() {
-  const { tabs, sections, activeKey, setActiveKey, onTabClose } = useTabs();
+  const {
+    tabs,
+    sections,
+    activeKey,
+    setActiveKey,
+    onTabClose,
+  } = useTabsContext();
 
   return (
     <Tabs
       activeKey={activeKey}
       tabs={tabs}
       sections={sections}
-      onChange={(key) => setActiveKey(key)}
+      onChange={setActiveKey}
       onDropdownTabClose={onTabClose}
     />
   );
