@@ -4,7 +4,7 @@ import DropdownTabComponent from "../DropdownTab/DropdownTabComponent";
 import { Section, Tab, TabKey, TabsRef } from "../types";
 import Slider from "../Slider/Slider";
 import useSlider from "./hooks/useSlider";
-import useKeyDownHandler from "./hooks/useKeyDownHandler";
+import useKeyboardNavigation from "./hooks/useKeyboardNavigation";
 import { DropdownTabContextProvider } from "../DropdownTab/DropdownTabContext/DropdownTabContextProvider";
 import generateTabId from "../utils/generateTabId";
 
@@ -65,7 +65,7 @@ function TabsComponent({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const { focusedTabId, handlers } = useKeyDownHandler({
+  const { focusedTabId, handlers } = useKeyboardNavigation({
     tabsRef,
     isMenuOpen,
     setIsMenuOpen,

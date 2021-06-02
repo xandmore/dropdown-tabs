@@ -26,7 +26,7 @@ function prevOrLast(currentIndex: number, max: number) {
   return currentIndex === 0 ? max : currentIndex - 1;
 }
 
-function useKeyDownHandler({
+function useKeyboardNavigation({
   tabsRef,
   isMenuOpen,
   setIsMenuOpen,
@@ -292,4 +292,4 @@ function handleDropdownTabKeydown(
   }
 }
 
-export default useKeyDownHandler;
+export default useKeyboardNavigation;
