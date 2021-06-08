@@ -8,7 +8,7 @@ function TabsWithContext() {
     sections,
     activeKey,
     setActiveKey,
-    onTabClose,
+    closeDropdownTab,
   } = useTabsContext();
 
   return (
@@ -17,7 +17,7 @@ function TabsWithContext() {
       tabs={tabs}
       sections={sections}
       onChange={setActiveKey}
-      onDropdownTabClose={onTabClose}
+      onDropdownTabClose={closeDropdownTab}
     />
   );
 }

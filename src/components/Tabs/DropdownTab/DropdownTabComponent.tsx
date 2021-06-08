@@ -1,4 +1,5 @@
 import React, {
+  FocusEventHandler,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -7,7 +8,12 @@ import React, {
 } from "react";
 import DropdownMenu from "../DropdownTabMenu/DropdownTabMenu";
 import bem from "../../../helpers/bem";
-import { DropdownTab, Section, TabKey } from "../types";
+import {
+  DropdownTab,
+  Section,
+  TabElementWithCustomFocus,
+  TabKey,
+} from "../types";
 import useWatchOutsideClick from "../DropdownTabMenu/hooks/useWatchOutsideClick";
 import getDropdownTabByKey from "../utils/getDropdownTabByKey";
 import { ReactComponent as DropdownIcon } from "../../../assets/arrow_drop_down_24dp.svg";
@@ -17,6 +23,7 @@ import useMergeHandlers from "../Tabs/hooks/useMergeHandlers";
 import useDropdownTabContext from "./DropdownTabContext/useDropdownTabContext";
 import { DropdownTabContextValue } from "./DropdownTabContext/DropdownTabContext";
 import { DropdownTabContextProvider } from "./DropdownTabContext/DropdownTabContextProvider";
+import useImperativeHandleProxy from "../hooks/useImperativeHandleProxy";
 
 const bemTabContainer = bem("dropdown-tab-container");
 const bemDropdownTab = bem("dropdown-tab");
@@ -34,10 +41,12 @@ export type DropdownTabProps = Omit<
   onWidthChange: (width: number) => void;
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  containerRef: (el: HTMLDivElement) => void;
+  onContainerBlur: FocusEventHandler<HTMLDivElement>;
 };
 
 const DropdownTabComponent = React.forwardRef<
-  HTMLButtonElement,
+  TabElementWithCustomFocus,
   DropdownTabProps
 >(function DropdownTabComponent(
   {
@@ -49,6 +58,8 @@ const DropdownTabComponent = React.forwardRef<
     activeKey,
     defaultKey,
     placeholder = "ACTIVE TABS",
+    containerRef,
+    onContainerBlur,
     ...props
   },
   ref
@@ -160,12 +171,36 @@ const DropdownTabComponent = React.forwardRef<
     onActivateMenuItem: onActivateMenuItemWrapped,
   };
 
+  useImperativeHandleProxy(
+    ref,
+    innerTabRef,
+    () => ({
+      focus: (options) => {
+        innerTabRef.current?.focus();
+
+        if (options?.hideRipple) {
+          setFocusInfo((prev) => ({
+            ...prev,
+            focused: false,
+          }));
+        }
+      },
+    }),
+    [setFocusInfo]
+  );
+
   return (
-    <div className={bemTabContainer()}>
+    <div
+      ref={containerRef}
+      className={bemTabContainer()}
+      onBlur={onContainerBlur}
+    >
       <button
         tabIndex={isMenuItemActive ? 0 : -1}
         className={bemTab({ active: isMenuItemActive, dropdown: true })}
         ref={(el) => {
+          innerTabRef.current = el as HTMLButtonElement;
+
           if (ref) {
             if (typeof ref === "function") {
               ref(el);
@@ -173,8 +208,6 @@ const DropdownTabComponent = React.forwardRef<
               ref.current = el;
             }
           }
-
-          innerTabRef.current = el as HTMLButtonElement;
         }}
         aria-haspopup={true}
         {...props}
