@@ -54,7 +54,11 @@ function TabsComponent({
   const tabsRef = useRef<TabsRef>({
     tabs: {},
     container: null,
-    dropdownTab: {},
+    dropdownTab: {
+      id: DROPDOWN_TAB_KEY,
+      element: null,
+      container: null,
+    },
     dropdownItems: {},
   } as TabsRef);
 
@@ -173,11 +177,12 @@ function TabsComponent({
       >
         {isDropdownTabDisplayed && (
           <DropdownTabComponent
+            containerRef={(el) => {
+              tabsRef.current.dropdownTab.container = el;
+            }}
+            onContainerBlur={handlers.onDropdownTabContainerBlur}
             ref={(el) => {
-              tabsRef.current.dropdownTab = {
-                id: DROPDOWN_TAB_KEY,
-                element: el,
-              };
+              tabsRef.current.dropdownTab.element = el;
             }}
             onFocus={(e) => {
               handlers.onDropdownTabFocus(DROPDOWN_TAB_KEY, e);

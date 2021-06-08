@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { Tab, TabKey, TabsRef } from "../../types";
 
 enum KeyCode {
@@ -16,6 +16,7 @@ type Handlers = {
   onTabBlur: (e?: React.FocusEvent) => void;
   onDropdownTabFocus: (id: Symbol, e?: React.FocusEvent) => void;
   onItemFocus: (tab: Tab, e: React.FocusEvent) => void;
+  onDropdownTabContainerBlur: (e: React.FocusEvent) => void;
 };
 
 function nextOrFirst(currentIndex: number, max: number) {
@@ -45,6 +46,15 @@ function useKeyboardNavigation({
     },
     onTabBlur: () => {
       setFocusedTabId(null);
+    },
+    onDropdownTabContainerBlur: (e) => {
+      if (
+        !tabsRef.current.dropdownTab.container?.contains(
+          e.relatedTarget as Node
+        )
+      ) {
+        setIsMenuOpen(false);
+      }
     },
     onDropdownTabFocus: (id) => {
       setFocusedTabId(id);
@@ -184,12 +194,10 @@ function handleDropdownMenuItemKeyDown(
   switch (keyCode) {
     case KeyCode.ArrowLeft:
       tabsInfo.tabs[maxTabIndex]?.element?.focus();
-      closeMenu();
       break;
 
     case KeyCode.ArrowRight:
       tabsInfo.tabs[0]?.element?.focus();
-      closeMenu();
       break;
 
     case KeyCode.ArrowUp:
@@ -247,7 +255,6 @@ function handleDropdownTabKeydown(
         const tabElement = tabsInfo.tabs[maxTabIndex].element;
         if (tabElement) {
           tabElement.focus();
-          closeMenu();
         }
       }
       break;
@@ -257,7 +264,6 @@ function handleDropdownTabKeydown(
         const tabElement = tabsInfo.tabs[0]?.element;
         if (tabElement) {
           tabElement.focus();
-          closeMenu();
         }
       }
       break;
@@ -280,7 +286,6 @@ function handleDropdownTabKeydown(
 
     case KeyCode.Home:
       tabsInfo.tabs[0].element?.focus();
-      closeMenu();
       break;
 
     case KeyCode.Escape:

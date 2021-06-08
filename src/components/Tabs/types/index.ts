@@ -36,6 +36,7 @@ export type TabsRef = {
   >;
 
   dropdownTab: {
+    container: HTMLDivElement | null;
     element: TabElementWithCustomFocus | null;
     id: Symbol;
   };

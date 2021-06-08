@@ -1,4 +1,5 @@
 import React, {
+  FocusEventHandler,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -40,6 +41,8 @@ export type DropdownTabProps = Omit<
   onWidthChange: (width: number) => void;
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  containerRef: (el: HTMLDivElement) => void;
+  onContainerBlur: FocusEventHandler<HTMLDivElement>;
 };
 
 const DropdownTabComponent = React.forwardRef<
@@ -55,6 +58,8 @@ const DropdownTabComponent = React.forwardRef<
     activeKey,
     defaultKey,
     placeholder = "ACTIVE TABS",
+    containerRef,
+    onContainerBlur,
     ...props
   },
   ref
@@ -185,7 +190,11 @@ const DropdownTabComponent = React.forwardRef<
   );
 
   return (
-    <div className={bemTabContainer()}>
+    <div
+      ref={containerRef}
+      className={bemTabContainer()}
+      onBlur={onContainerBlur}
+    >
       <button
         tabIndex={isMenuItemActive ? 0 : -1}
         className={bemTab({ active: isMenuItemActive, dropdown: true })}
