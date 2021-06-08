@@ -16,26 +16,34 @@ export interface Section {
   tabs: DropdownTab[];
 }
 
+export type TabElementWithCustomFocus = Omit<HTMLButtonElement, "focus"> & {
+  focus: (
+    options?: Parameters<HTMLButtonElement["focus"]>[0] & {
+      hideRipple: boolean;
+    }
+  ) => void;
+};
+
 export type TabsRef = {
   container: HTMLDivElement | null;
 
   tabs: Record<
     number,
     {
-      element: HTMLButtonElement | null;
+      element: TabElementWithCustomFocus | null;
       tab: Tab;
     }
   >;
 
   dropdownTab: {
-    element: HTMLButtonElement | null;
+    element: TabElementWithCustomFocus | null;
     id: Symbol;
   };
 
   dropdownItems: Record<
     number,
     {
-      element: HTMLButtonElement | null;
+      element: TabElementWithCustomFocus | null;
       tab: Tab;
     }
   >;

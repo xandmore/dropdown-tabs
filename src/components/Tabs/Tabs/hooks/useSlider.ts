@@ -66,8 +66,9 @@ function useSlider(
   });
 
   const onDropdownTabWidthChange = useCallback(() => {
+    const node = tabsRef.current.dropdownTab.element?.parentNode as HTMLElement;
+
     setDisplayInfo((prev) => {
-      const node = tabsRef.current.dropdownTab.element;
       return {
         ...prev,
         width: node?.getBoundingClientRect().width ?? 0,

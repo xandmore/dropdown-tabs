@@ -7,6 +7,7 @@ import useSlider from "./hooks/useSlider";
 import useKeyboardNavigation from "./hooks/useKeyboardNavigation";
 import { DropdownTabContextProvider } from "../DropdownTab/DropdownTabContext/DropdownTabContextProvider";
 import generateTabId from "../utils/generateTabId";
+import { DropdownTabContextValue } from "../DropdownTab/DropdownTabContext/DropdownTabContext";
 
 const DROPDOWN_TAB_KEY = Symbol();
 
@@ -71,6 +72,50 @@ function TabsComponent({
     setIsMenuOpen,
   });
 
+  const onCloseMenuItem = useCallback<
+    DropdownTabContextValue["onCloseMenuItem"]
+  >(
+    (tabKey, initiatedByKeyboard) => {
+      onDropdownTabClose(tabKey);
+
+      const dropdownTabs = Object.entries(tabsRef.current.dropdownItems);
+
+      const focusTheFirstTabOrContainer = () => {
+        if (tabsRef.current.tabs[0]?.element) {
+          tabsRef.current.tabs[0].element!.focus();
+        } else {
+          tabsRef.current.container?.focus();
+        }
+      };
+
+      if (tabKey === activeTabKey) {
+        if (dropdownTabs.length > 1) {
+          tabsRef.current.dropdownTab.element?.focus({
+            hideRipple: !initiatedByKeyboard,
+          });
+        } else {
+          focusTheFirstTabOrContainer();
+        }
+        return;
+      }
+
+      // set focus on prev menuItems if possible
+      if (dropdownTabs.length > 1) {
+        const index = +dropdownTabs.find(
+          ([, tab]) => tab.tab.key === tabKey
+        )![0];
+
+        const newIndex = index === 0 ? 1 : index - 1;
+        tabsRef.current.dropdownItems[newIndex].element?.focus({
+          hideRipple: !initiatedByKeyboard,
+        });
+      } else {
+        focusTheFirstTabOrContainer();
+      }
+    },
+    [onDropdownTabClose, activeTabKey]
+  );
+
   return (
     <div
       className="tabs"
@@ -116,7 +161,7 @@ function TabsComponent({
         }, [])}
         onMenuItemFocus={handlers.onItemFocus}
         focusedTabId={focusedTabId}
-        onCloseMenuItem={onDropdownTabClose}
+        onCloseMenuItem={onCloseMenuItem}
         onActivateMenuItem={useCallback(
           (tabKey) => {
             tabsRef.current.dropdownTab.element?.focus();

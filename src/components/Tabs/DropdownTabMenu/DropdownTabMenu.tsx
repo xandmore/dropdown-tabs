@@ -1,6 +1,12 @@
-import React, { FocusEventHandler, useCallback, useMemo } from "react";
+import React, { FocusEventHandler, useCallback, useMemo, useRef } from "react";
 import bem from "../../../helpers/bem";
-import { DropdownTab, Section, Tab, TabKey } from "../types";
+import {
+  DropdownTab,
+  Section,
+  Tab,
+  TabElementWithCustomFocus,
+  TabKey,
+} from "../types";
 import { ReactComponent as CloseIcon } from "../../../assets/close_24dp.svg";
 import { ReactComponent as LockIcon } from "../../../assets/lock_24dp.svg";
 import { ReactComponent as StarIcon } from "../../../assets/star_outline_24dp.svg";
@@ -9,6 +15,7 @@ import useRipple from "../Tabs/hooks/useRipple";
 import Ripple from "../Ripple/Ripple";
 import useMergeHandlers from "../Tabs/hooks/useMergeHandlers";
 import generateTabId from "../utils/generateTabId";
+import useImperativeHandleProxy from "../hooks/useImperativeHandleProxy";
 
 const bemMenu = bem("dropdown-menu");
 const bemMenuItem = bem("dropdown-menu-item");
@@ -74,7 +81,11 @@ export type DropdownMenuSectionProps = {
   id: string;
   tabs: DropdownTab[];
   activeKey: TabKey | null;
-  menuItemRef: (element: HTMLButtonElement, tab: Tab, index: number) => void;
+  menuItemRef: (
+    element: TabElementWithCustomFocus,
+    tab: Tab,
+    index: number
+  ) => void;
 };
 
 function DropdownMenuSection({
@@ -113,7 +124,7 @@ export type DropdownMenuItemProps = {
   tab: DropdownTab;
   disabled?: boolean;
   active: boolean;
-  menuItemRef: (el: HTMLButtonElement | null) => void;
+  menuItemRef: (el: TabElementWithCustomFocus) => void;
 };
 
 function DropdownMenuItem({
@@ -135,6 +146,7 @@ function DropdownMenuItem({
     isRippleDisplayed,
     rippleRelatedHandlers,
     pressingInfo,
+    setFocusInfo,
   } = useRipple();
 
   const onFocusCallback: FocusEventHandler<HTMLButtonElement> = useCallback(
@@ -150,13 +162,34 @@ function DropdownMenuItem({
   );
 
   const tabIndex = tab.key === focusedTabId ? 0 : -1;
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useImperativeHandleProxy(
+    menuItemRef,
+    buttonRef,
+    () => ({
+      focus: (options) => {
+        buttonRef.current?.focus();
+
+        if (options?.hideRipple) {
+          setFocusInfo((prev) => ({
+            ...prev,
+            focused: false,
+          }));
+        }
+      },
+    }),
+    [setFocusInfo]
+  );
+
   return (
     <li role="presentation" style={{ position: "relative" }}>
       <button
         role="tab"
         aria-selected={active}
         id={generateTabId(tab)}
-        ref={(el) => menuItemRef((el as unknown) as HTMLButtonElement)}
+        ref={buttonRef}
         className={bemMenuItem("tab", {
           active: active,
           locked: locked,
@@ -199,7 +232,8 @@ function DropdownMenuItem({
             onFocus={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              onCloseMenuItem(tab.key);
+
+              onCloseMenuItem(tab.key, e.detail === 0);
             }}
           >
             <CloseIcon className={bemIcon({ small: true })} />
