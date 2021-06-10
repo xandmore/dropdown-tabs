@@ -128,6 +128,34 @@ function TabsComponent({
     sections
   );
 
+  const menuItemRefCallback = useCallback((el, tab, index) => {
+    if (!el) {
+      delete tabsRef.current.dropdownItems[index];
+      return;
+    }
+
+    tabsRef.current.dropdownItems[index] = {
+      tab: tab,
+      element: el,
+    };
+  }, []);
+
+  const onActivateMenuItem = useCallback(
+    (tabKey) => {
+      tabsRef.current.dropdownTab.element?.focus();
+      setIsMenuOpen(false);
+      onChange(tabKey);
+    },
+    [onChange]
+  );
+
+  if (!tabIndexesInfo.tabKey && !tabIndexesInfo.isDropdownTab) {
+    console.error(
+      "You should provide either common or dropdown tabs to the components"
+    );
+    return null;
+  }
+
   return (
     <div
       className="tabs"
@@ -161,28 +189,11 @@ function TabsComponent({
       ))}
 
       <DropdownTabContextProvider
-        menuItemRef={useCallback((el, tab, index) => {
-          if (!el) {
-            delete tabsRef.current.dropdownItems[index];
-            return;
-          }
-
-          tabsRef.current.dropdownItems[index] = {
-            tab: tab,
-            element: el,
-          };
-        }, [])}
+        menuItemRef={menuItemRefCallback}
         onMenuItemFocus={handlers.onItemFocus}
         focusedTabId={focusedTabId}
         onCloseMenuItem={onCloseMenuItem}
-        onActivateMenuItem={useCallback(
-          (tabKey) => {
-            tabsRef.current.dropdownTab.element?.focus();
-            setIsMenuOpen(false);
-            onChange(tabKey);
-          },
-          [onChange]
-        )}
+        onActivateMenuItem={onActivateMenuItem}
       >
         {isDropdownTabDisplayed && (
           <DropdownTabComponent
