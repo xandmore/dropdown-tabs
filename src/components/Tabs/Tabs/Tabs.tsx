@@ -8,6 +8,7 @@ import useKeyboardNavigation from "./hooks/useKeyboardNavigation";
 import { DropdownTabContextProvider } from "../DropdownTab/DropdownTabContext/DropdownTabContextProvider";
 import generateTabId from "../utils/generateTabId";
 import { DropdownTabContextValue } from "../DropdownTab/DropdownTabContext/DropdownTabContext";
+import getDropdownTabByKey from "../utils/getDropdownTabByKey";
 
 const DROPDOWN_TAB_KEY = Symbol();
 
@@ -120,6 +121,13 @@ function TabsComponent({
     [onDropdownTabClose, activeTabKey]
   );
 
+  const tabIndexesInfo = getTabIndexes(
+    focusedTabId,
+    activeTabKey,
+    tabs,
+    sections
+  );
+
   return (
     <div
       className="tabs"
@@ -145,6 +153,7 @@ function TabsComponent({
           }}
           title={tab.title}
           active={activeTabKey === tab.key}
+          tabIndex={tabIndexesInfo.tabKey === tab.key ? 0 : -1}
           onClick={() => onChange(tab.key)}
           onBlur={handlers.onTabBlur}
           onFocus={() => handlers.onTabFocus(tab)}
@@ -194,6 +203,7 @@ function TabsComponent({
             onWidthChange={onDropdownTabWidthChange}
             isMenuOpen={isMenuOpen}
             setIsMenuOpen={setIsMenuOpen}
+            tabIndex={tabIndexesInfo.isDropdownTab ? 0 : -1}
           />
         )}
       </DropdownTabContextProvider>
@@ -203,6 +213,41 @@ function TabsComponent({
       )}
     </div>
   );
+}
+
+function getTabIndexes(
+  focusedTabId: string | Symbol | null,
+  activeTabKey: TabKey | null,
+  tabs: Tab[],
+  sections: Section[]
+): { tabKey?: TabKey | null; isDropdownTab: boolean } {
+  let [tab, isDropdownTab] = search(focusedTabId || activeTabKey);
+
+  if (!tab && !isDropdownTab) {
+    if (tabs.length) {
+      tab = tabs[0];
+    } else {
+      isDropdownTab = sections.some((s) => s.tabs.length);
+    }
+  }
+
+  return {
+    tabKey: tab?.key,
+    isDropdownTab,
+  };
+
+  function search(key?: TabKey | Symbol | null) {
+    const tab = tabs.find((t) => t.key === focusedTabId);
+    let dropdownTab = false;
+    if (!tab) {
+      dropdownTab = !!(
+        focusedTabId === DROPDOWN_TAB_KEY ||
+        getDropdownTabByKey(focusedTabId as TabKey, sections).tab
+      );
+    }
+
+    return [tab, dropdownTab] as const;
+  }
 }
 
 export default TabsComponent;

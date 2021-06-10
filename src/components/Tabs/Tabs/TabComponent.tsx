@@ -45,7 +45,6 @@ const TabComponent = React.forwardRef<TabElementWithCustomFocus, TabProps>(
 
     return (
       <button
-        tabIndex={active ? 0 : -1}
         ref={(el) => {
           innerRef.current = el;
 
