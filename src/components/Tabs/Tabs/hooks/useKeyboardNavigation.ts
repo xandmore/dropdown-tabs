@@ -48,13 +48,11 @@ function useKeyboardNavigation({
       setFocusedTabId(null);
     },
     onDropdownTabContainerBlur: (e) => {
-      if (
-        !tabsRef.current.dropdownTab.container?.contains(
+      setIsMenuOpen(
+        !!tabsRef.current.dropdownTab.container?.contains(
           e.relatedTarget as Node
         )
-      ) {
-        setIsMenuOpen(false);
-      }
+      );
     },
     onDropdownTabFocus: (id) => {
       setFocusedTabId(id);
@@ -251,21 +249,11 @@ function handleDropdownTabKeydown(
 
   switch (keyCode) {
     case KeyCode.ArrowLeft:
-      {
-        const tabElement = tabsInfo.tabs[maxTabIndex].element;
-        if (tabElement) {
-          tabElement.focus();
-        }
-      }
+      tabsInfo.tabs[maxTabIndex]?.element?.focus();
       break;
 
     case KeyCode.ArrowRight:
-      {
-        const tabElement = tabsInfo.tabs[0]?.element;
-        if (tabElement) {
-          tabElement.focus();
-        }
-      }
+      tabsInfo.tabs[0]?.element?.focus();
       break;
 
     case KeyCode.ArrowUp:
