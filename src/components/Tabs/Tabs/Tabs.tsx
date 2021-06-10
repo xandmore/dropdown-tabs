@@ -104,7 +104,7 @@ function TabsComponent({
         return;
       }
 
-      // set focus on prev menuItems if possible
+      // set focus on prev menuItem if possible
       if (dropdownTabs.length > 1) {
         const index = +dropdownTabs.find(
           ([, tab]) => tab.tab.key === tabKey
