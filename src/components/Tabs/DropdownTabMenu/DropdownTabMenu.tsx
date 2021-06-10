@@ -61,8 +61,14 @@ export function DropdownMenu({ open, sections, activeKey }: DropdownMenuProps) {
       role="presentation"
       aria-hidden={!open}
       className={bemMenu({ closed: !open })}
-      onClick={(e) => e.stopPropagation()}
-      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       onKeyDown={(e) => {
         switch (e.nativeEvent.code) {
           case "Enter":

@@ -1,5 +1,5 @@
 import React, {
-  FocusEventHandler,
+  FocusEvent,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -14,7 +14,6 @@ import {
   TabElementWithCustomFocus,
   TabKey,
 } from "../types";
-import useWatchOutsideClick from "../DropdownTabMenu/hooks/useWatchOutsideClick";
 import getDropdownTabByKey from "../utils/getDropdownTabByKey";
 import { ReactComponent as DropdownIcon } from "../../../assets/arrow_drop_down_24dp.svg";
 import Ripple from "../Ripple/Ripple";
@@ -42,7 +41,7 @@ export type DropdownTabProps = Omit<
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   containerRef: (el: HTMLDivElement) => void;
-  onContainerBlur: FocusEventHandler<HTMLDivElement>;
+  onContainerBlur: (e: FocusEvent<HTMLDivElement>, ignore?: boolean) => void;
 };
 
 const DropdownTabComponent = React.forwardRef<
@@ -97,12 +96,6 @@ const DropdownTabComponent = React.forwardRef<
 
   const prevTabWidth = useRef<number | null>(null);
   const innerTabRef = useRef<HTMLButtonElement>(null!);
-
-  const closeOutsideClick = useCallback(() => {
-    setIsMenuOpen(false);
-  }, [setIsMenuOpen]);
-
-  useWatchOutsideClick(innerTabRef, closeOutsideClick);
 
   useLayoutEffect(() => {
     const width = innerTabRef.current.clientWidth ?? 0;
@@ -191,12 +184,12 @@ const DropdownTabComponent = React.forwardRef<
 
   return (
     <div
+      role="presentation"
       ref={containerRef}
       className={bemTabContainer()}
       onBlur={onContainerBlur}
     >
       <button
-        tabIndex={isMenuItemActive ? 0 : -1}
         className={bemTab({ active: isMenuItemActive, dropdown: true })}
         ref={(el) => {
           innerTabRef.current = el as HTMLButtonElement;
