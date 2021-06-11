@@ -1,5 +1,5 @@
 # Dropdown tabs
 
-Demo project
+Check out the [Demo](https://xandmore.github.io/dropdown-tabs)
 
 ![preview](./docs/preview.png)
